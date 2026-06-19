@@ -96,14 +96,14 @@
         input, select { padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 15px; }
         .item-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
         .item-table th { background-color: var(--light); text-align: left; padding: 12px; border-bottom: 2px solid #e2e8f0; }
-        .item-table td { padding: 10px; border-bottom: 1px solid #e2e8f0; }
+        .item-table td { padding: 10px; border-bottom: 1px solid #e2e8f0; vertical-align: middle; }
         .button-zone { display: flex; gap: 10px; flex-wrap: wrap; }
         .btn { padding: 10px 20px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; }
         .btn-add { background-color: var(--primary); color: white; }
         .btn-print { background-color: var(--success); color: white; }
         .btn-save { background-color: var(--save); color: white; }
         .btn-new { background-color: var(--new-btn); color: white; }
-        .btn-danger { background-color: #ef4444; color: white; padding: 5px 10px; font-size: 13px; }
+        .btn-danger { background-color: #ef4444; color: white; padding: 5px 10px; font-size: 13px; border: none; border-radius: 4px; cursor: pointer; }
         .btn-view { background-color: #0284c7; color: white; padding: 4px 10px; font-size: 13px; border-radius: 4px; border: none; cursor: pointer; }
         .btn:hover { opacity: 0.9; transform: translateY(-1px); }
         .totals-box { width: 300px; margin-left: auto; margin-top: 20px; background: var(--light); padding: 15px; border-radius: 8px; }
@@ -154,7 +154,7 @@
             .nav-bar, .no-print, .history-container, .btn-danger, .analytics-grid { display: none !important; }
             body { background: white; padding: 0; }
             .billing-container { box-shadow: none; padding: 0; margin-bottom: 0; }
-            input { border: none; padding: 0; background: transparent; }
+            input, select { border: none; padding: 0; background: transparent; appearance: none; -webkit-appearance: none; color: black !important; }
         }
     </style>
 </head>
@@ -218,21 +218,15 @@
                 <table class="item-table" id="billTable">
                     <thead>
                         <tr>
-                            <th>Item Description</th>
-                            <th style="width: 120px;">Price (रु)</th>
+                            <th>Select / Type Item</th>
+                            <th style="width: 130px;">Price (रु)</th>
                             <th style="width: 100px;">Quantity</th>
                             <th style="width: 120px;">Total (रु)</th>
                             <th class="no-print" style="width: 80px;">Action</th>
                         </tr>
                     </thead>
                     <tbody id="itemRows">
-                        <tr>
-                            <td><input type="text" class="item-desc" placeholder="Saman ko naam" style="width:90%"></td>
-                            <td><input type="number" class="item-price" value="0" oninput="calculateTotal()" style="width:80px"></td>
-                            <td><input type="number" class="item-qty" value="1" oninput="calculateTotal()" style="width:60px"></td>
-                            <td class="item-total">रु 0.00</td>
-                            <td class="no-print"><button class="btn btn-danger" onclick="deleteRow(this)">Delete</button></td>
-                        </tr>
+                        <!-- Pehli row function se load hogi load hone par -->
                     </tbody>
                 </table>
 
@@ -292,6 +286,19 @@
 <script>
     let billsHistory = [];
 
+    // Master Product List (Aapki items aur unke rates)
+    const productPreset = [
+        { name: "Photocopy", price: 10 },
+        { name: "P.P Photo (6 Copies)", price: 150 },
+        { name: "P.P Photo (12 Copies)", price: 250 },
+        { name: "Nibedan (निवेदन)", price: 40 },
+        { name: "जन्म दर्ता अनलाइन", price: 50 },
+        { name: "मृत्यु दर्ता अनलाइन", price: 50 },
+        { name: "बसाइ सराइ अनलाइन (Per Head)", price: 50 },
+        { name: "विवाह दर्ता अनलाइन", price: 80 },
+        { name: "Photocopy Paper (Per Piece)", price: 5 }
+    ];
+
     window.onload = function() {
         const remembered = localStorage.getItem('rememberedUser');
         if (remembered === "true") {
@@ -300,6 +307,8 @@
             loadHistory();
         }
         setCurrentDate();
+        // Shuruat me ek khali row generate karne ke liye
+        addRow();
     };
 
     function setCurrentDate() {
@@ -332,17 +341,56 @@
         btn.classList.add('active');
     }
 
-    function addRow() {
+    // Dynamic Row Generator with Dropdown Menu
+    function addRow(customName = "", customPrice = 0, customQty = 1) {
         const tbody = document.getElementById('itemRows');
         const tr = document.createElement('tr');
+        
+        // Options build karne ka tareeqa
+        let optionsHTML = `<option value="custom">-- Custom Item (Type Hand) --</option>`;
+        productPreset.forEach(prod => {
+            const selected = (customName === prod.name) ? "selected" : "";
+            optionsHTML += `<option value="${prod.price}" ${selected}>${prod.name} (रु ${prod.price})</option>`;
+        });
+
+        // Is it custom item loaded from old bill history?
+        const isCustomPreset = customName && !productPreset.some(p => p.name === customName);
+
         tr.innerHTML = `
-            <td><input type="text" class="item-desc" placeholder="Saman ko naam" style="width:90%"></td>
-            <td><input type="number" class="item-price" value="0" oninput="calculateTotal()" style="width:80px"></td>
-            <td><input type="number" class="item-qty" value="1" oninput="calculateTotal()" style="width:60px"></td>
+            <td>
+                <div style="display:flex; flex-direction:column; gap:5px;">
+                    <select class="item-select" onchange="handleSelectChange(this)" style="width:95%">
+                        ${optionsHTML}
+                        ${isCustomPreset ? `<option value="custom" selected>${customName}</option>` : ''}
+                    </select>
+                    <input type="text" class="item-desc" placeholder="Saman ko naam lekhiye" value="${customName}" style="width:90%; display: ${customName && !isCustomPreset ? 'none' : 'block'};">
+                </div>
+            </td>
+            <td><input type="number" class="item-price" value="${customPrice}" oninput="calculateTotal()" style="width:90px"></td>
+            <td><input type="number" class="item-qty" value="${customQty}" oninput="calculateTotal()" style="width:60px"></td>
             <td class="item-total">रु 0.00</td>
             <td class="no-print"><button class="btn btn-danger" onclick="deleteRow(this)">Delete</button></td>
         `;
         tbody.appendChild(tr);
+        calculateTotal();
+    }
+
+    // Dropdown change hone par automatic details bharne ke liye
+    function handleSelectChange(selectElem) {
+        const row = selectElem.parentNode.parentNode.parentNode;
+        const txtInput = row.querySelector('.item-desc');
+        const priceInput = row.querySelector('.item-price');
+        
+        if(selectElem.value === "custom") {
+            txtInput.style.display = "block";
+            txtInput.value = "";
+            priceInput.value = 0;
+        } else {
+            txtInput.style.display = "none";
+            txtInput.value = selectElem.options[selectElem.selectedIndex].text.split(' (रु')[0];
+            priceInput.value = selectElem.value;
+        }
+        calculateTotal();
     }
 
     function deleteRow(button) {
@@ -372,11 +420,9 @@
         return subtotal.toFixed(2);
     }
 
-    // New Bill Functionality: Clears form without any back action
     function clearFormForNewBill() {
         document.getElementById('customerName').value = '';
         
-        // Auto incrementing invoice number smartly
         const lastInv = document.getElementById('invoiceNum').value;
         const match = lastInv.match(/(\d+)$/);
         if(match) {
@@ -388,18 +434,8 @@
         }
 
         setCurrentDate();
-        
-        const tbody = document.getElementById('itemRows');
-        tbody.innerHTML = `
-            <tr>
-                <td><input type="text" class="item-desc" placeholder="Saman ko naam" style="width:90%"></td>
-                <td><input type="number" class="item-price" value="0" oninput="calculateTotal()" style="width:80px"></td>
-                <td><input type="number" class="item-qty" value="1" oninput="calculateTotal()" style="width:60px"></td>
-                <td class="item-total">रु 0.00</td>
-                <td class="no-print"><button class="btn btn-danger" onclick="deleteRow(this)">Delete</button></td>
-            </tr>
-        `;
-        calculateTotal();
+        document.getElementById('itemRows').innerHTML = '';
+        addRow(); // fresh dropdown row setup
         window.scrollTo({top: 0, behavior: 'smooth'});
     }
 
@@ -423,7 +459,7 @@
             id: Date.now(),
             invoiceNum: invoiceNum,
             customerName: customerName,
-            date: invoiceDate, // YYYY-MM-DD
+            date: invoiceDate,
             total: parseFloat(totalAmt) || 0,
             items: items
         };
@@ -445,7 +481,6 @@
         }
     }
 
-    // Calculates and displays Daily, Weekly, and Monthly income dynamically
     function calculateEarnings() {
         const todayStr = new Date().toISOString().split('T')[0];
         const todayObj = new Date(todayStr);
@@ -460,15 +495,12 @@
             const diffTime = todayObj - billDate;
             const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
-            // 1. Daily
             if (bill.date === todayStr) {
                 dailyTotal += bill.total;
             }
-            // 2. Weekly (Last 7 Days)
             if (diffDays >= 0 && diffDays < 7) {
                 weeklyTotal += bill.total;
             }
-            // 3. Monthly (Last 30 Days)
             if (diffDays >= 0 && diffDays < 30) {
                 monthlyTotal += bill.total;
             }
@@ -488,7 +520,6 @@
             return;
         }
 
-        // Reverse to show latest first
         [...billsHistory].reverse().forEach((bill) => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
@@ -514,21 +545,11 @@
         document.getElementById('invoiceDate').value = bill.date;
 
         const tbody = document.getElementById('itemRows');
-        tbody.innerHTML = '';
+        tbody.innerHTML = ''; // Fresh clean render
 
         bill.items.forEach(item => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td><input type="text" class="item-desc" value="${item.desc}" style="width:90%"></td>
-                <td><input type="number" class="item-price" value="${item.price}" oninput="calculateTotal()" style="width:80px"></td>
-                <td><input type="number" class="item-qty" value="${item.qty}" oninput="calculateTotal()" style="width:60px"></td>
-                <td class="item-total">रु 0.00</td>
-                <td class="no-print"><button class="btn btn-danger" onclick="deleteRow(this)">Delete</button></td>
-            `;
-            tbody.appendChild(tr);
+            addRow(item.desc, item.price, item.qty);
         });
-
-        calculateTotal();
         window.scrollTo({top: 0, behavior: 'smooth'});
     }
 
