@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pin2 Kumar's BillMaster</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --success: #16a34a;
+            --dark: #1e293b;
+            --light: #f8fafc;
+        }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #f1f5f9;
+            margin: 0;
+            padding: 20px;
+            color: var(--dark);
+        }
+        .billing-container {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            margin: 0;
+            color: var(--primary);
+            font-size: 28px;
+        }
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .input-group label {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #64748b;
+        }
+        input, select {
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 15px;
+        }
+        input:focus {
+            outline: 2px solid var(--primary);
+        }
+        .item-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .item-table th {
+            background-color: var(--light);
+            text-align: left;
+            padding: 12px;
+            font-weight: 600;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        .item-table td {
+            padding: 10px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-add { background-color: var(--primary); color: white; }
+        .btn-print { background-color: var(--success); color: white; float: right; }
+        .btn-danger { background-color: #ef4444; color: white; padding: 5px 10px; font-size: 13px; }
+        .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+        .totals-box {
+            width: 300px;
+            margin-left: auto;
+            margin-top: 20px;
+            background: var(--light);
+            padding: 15px;
+            border-radius: 8px;
+        }
+        .totals-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 15px;
+        }
+        .grand-total {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--primary);
+            border-top: 1px solid #cbd5e1;
+            padding-top: 10px;
+        }
+        /* Print Styles */
+        @media print {
+            body { background: white; padding: 0; }
+            .billing-container { box-shadow: none; padding: 0; }
+            .no-print { display: none !important; }
+            input { border: none; padding: 0; background: transparent; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="billing-container">
+    <!-- Header -->
+    <div class="header">
+        <div>
+            <h1>Pin2 Kumar's BillMaster</h1>
+            <p style="margin: 5px 0 0 0; color: #64748b;">Professional Invoicing System</p>
+        </div>
+        <div class="no-print">
+            <button class="btn btn-print" onclick="window.print()">🖨️ Print / Save PDF</button>
+        </div>
+    </div>
+
+    <!-- Customer & Bill Info -->
+    <div class="meta-grid">
+        <div class="input-group">
+            <label>Customer Name</label>
+            <input type="text" id="customerName" placeholder="Grahak ka naam">
+        </div>
+        <div class="input-group">
+            <label>Invoice Number</label>
+            <input type="text" id="invoiceNum" value="INV-1001">
+        </div>
+        <div class="input-group">
+            <label>Date</label>
+            <input type="date" id="invoiceDate">
+        </div>
+    </div>
+
+    <!-- Items Table -->
+    <table class="item-table" id="billTable">
+        <thead>
+            <tr>
+                <th>Item Description</th>
+                <th style="width: 120px;">Price (₹)</th>
+                <th style="width: 100px;">Quantity</th>
+                <th style="width: 120px;">Total (₹)</th>
+                <th class="no-print" style="width: 80px;">Action</th>
+            </tr>
+        </thead>
+        <tbody id="itemRows">
+            <!-- First Default Row -->
+            <tr>
+                <td><input type="text" class="item-desc" placeholder="Item ka naam" style="width:90%"></td>
+                <td><input type="number" class="item-price" value="0" oninput="calculateTotal()" style="width:80px"></td>
+                <td><input type="number" class="item-qty" value="1" oninput="calculateTotal()" style="width:60px"></td>
+                <td class="item-total">₹0.00</td>
+                <td class="no-print"><button class="btn btn-danger" onclick="deleteRow(this)">Delete</button></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <button class="btn btn-add no-print" onclick="addRow()">➕ Add New Item</button>
+
+    <!-- Totals -->
+    <div class="totals-box">
+        <div class="totals-row">
+            <span>Subtotal:</span>
+            <span id="subTotal">₹0.00</span>
+        </div>
+        <div class="totals-row">
+            <span>GST (18%):</span>
+            <span id="gstTotal">₹0.00</span>
+        </div>
+        <div class="totals-row grand-total">
+            <span>Grand Total:</span>
+            <span id="grandTotal">₹0.00</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Set current date automatically
+    document.getElementById('invoiceDate').valueAsDate = new Date();
+
+    function addRow() {
+        const tbody = document.getElementById('itemRows');
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td><input type="text" class="item-desc" placeholder="Item ka naam" style="width:90%"></td>
+            <td><input type="number" class="item-price" value="0" oninput="calculateTotal()" style="width:80px"></td>
+            <td><input type="number" class="item-qty" value="1" oninput="calculateTotal()" style="width:60px"></td>
+            <td class="item-total">₹0.00</td>
+            <td class="no-print"><button class="btn btn-danger" onclick="deleteRow(this)">Delete</button></td>
+        `;
+        tbody.appendChild(tr);
+    }
+
+    function deleteRow(button) {
+        const row = button.parentNode.parentNode;
+        const tbody = document.getElementById('itemRows');
+        if(tbody.rows.length > 1) {
+            row.remove();
+            calculateTotal();
+        } else {
+            alert("Kam se kam ek item hona zaroori hai!");
+        }
+    }
+
+    function calculateTotal() {
+        const rows = document.getElementById('itemRows').rows;
+        let subtotal = 0;
+
+        for (let i = 0; i < rows.length; i++) {
+            const price = parseFloat(rows[i].querySelector('.item-price').value) || 0;
+            const qty = parseFloat(rows[i].querySelector('.item-qty').value) || 0;
+            const total = price * qty;
+            
+            rows[i].querySelector('.item-total').innerText = "₹" + total.toFixed(2);
+            subtotal += total;
+        }
+
+        const gst = subtotal * 0.18;
+        const grandTotal = subtotal + gst;
+
+        document.getElementById('subTotal').innerText = "₹" + subtotal.toFixed(2);
+        document.getElementById('gstTotal').innerText = "₹" + gst.toFixed(2);
+        document.getElementById('grandTotal').innerText = "₹" + grandTotal.toFixed(2);
+    }
+</script>
+
+</body>
+</html>
