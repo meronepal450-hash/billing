@@ -1,13 +1,14 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="ne">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pin2 Kumar's BillMaster</title>
+    <title>Pin2 Kumar's Nepali BillMaster</title>
     <style>
         :root {
-            --primary: #2563eb;
+            --primary: #1e3a8a;
             --success: #16a34a;
+            --save: #ea580c;
             --dark: #1e293b;
             --light: #f8fafc;
         }
@@ -18,6 +19,23 @@
             padding: 20px;
             color: var(--dark);
         }
+        /* Login Screen Styles */
+        #login-screen {
+            max-width: 400px;
+            margin: 100px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        #login-screen h2 { color: var(--primary); margin-bottom: 20px; }
+        .login-input {
+            width: 90%; padding: 10px; margin-bottom: 15px;
+            border: 1px solid #cbd5e1; border-radius: 6px; font-size: 16px;
+        }
+        /* Main App Styles */
+        #app-screen { display: none; }
         .billing-container {
             max-width: 900px;
             margin: auto;
@@ -27,93 +45,30 @@
             box-shadow: 0 4px 20px rgba(0,0,0,0.08);
         }
         .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid #e2e8f0;
-            padding-bottom: 20px;
-            margin-bottom: 20px;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 2px solid #e2e8f0; padding-bottom: 20px; margin-bottom: 20px;
         }
-        .header h1 {
-            margin: 0;
-            color: var(--primary);
-            font-size: 28px;
-        }
+        .header h1 { margin: 0; color: var(--primary); font-size: 28px; }
         .meta-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 30px;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px; margin-bottom: 30px;
         }
-        .input-group {
-            display: flex;
-            flex-direction: column;
-        }
-        .input-group label {
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 5px;
-            color: #64748b;
-        }
-        input, select {
-            padding: 10px;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
-            font-size: 15px;
-        }
-        input:focus {
-            outline: 2px solid var(--primary);
-        }
-        .item-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-        .item-table th {
-            background-color: var(--light);
-            text-align: left;
-            padding: 12px;
-            font-weight: 600;
-            border-bottom: 2px solid #e2e8f0;
-        }
-        .item-table td {
-            padding: 10px;
-            border-bottom: 1px solid #e2e8f0;
-        }
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.2s;
-        }
+        .input-group { display: flex; flex-direction: column; }
+        .input-group label { font-size: 14px; font-weight: 600; margin-bottom: 5px; color: #64748b; }
+        input, select { padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 15px; }
+        .item-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        .item-table th { background-color: var(--light); text-align: left; padding: 12px; border-bottom: 2px solid #e2e8f0; }
+        .item-table td { padding: 10px; border-bottom: 1px solid #e2e8f0; }
+        .button-zone { display: flex; gap: 10px; }
+        .btn { padding: 10px 20px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; }
         .btn-add { background-color: var(--primary); color: white; }
-        .btn-print { background-color: var(--success); color: white; float: right; }
+        .btn-print { background-color: var(--success); color: white; }
+        .btn-save { background-color: var(--save); color: white; }
         .btn-danger { background-color: #ef4444; color: white; padding: 5px 10px; font-size: 13px; }
         .btn:hover { opacity: 0.9; transform: translateY(-1px); }
-        .totals-box {
-            width: 300px;
-            margin-left: auto;
-            margin-top: 20px;
-            background: var(--light);
-            padding: 15px;
-            border-radius: 8px;
-        }
-        .totals-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            font-size: 15px;
-        }
-        .grand-total {
-            font-size: 18px;
-            font-weight: bold;
-            color: var(--primary);
-            border-top: 1px solid #cbd5e1;
-            padding-top: 10px;
-        }
-        /* Print Styles */
+        .totals-box { width: 300px; margin-left: auto; margin-top: 20px; background: var(--light); padding: 15px; border-radius: 8px; }
+        .totals-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 15px; }
+        .grand-total { font-size: 18px; font-weight: bold; color: var(--primary); border-top: 1px solid #cbd5e1; padding-top: 10px; }
         @media print {
             body { background: white; padding: 0; }
             .billing-container { box-shadow: none; padding: 0; }
@@ -124,88 +79,113 @@
 </head>
 <body>
 
-<div class="billing-container">
-    <!-- Header -->
-    <div class="header">
-        <div>
-            <h1>Pin2 Kumar's BillMaster</h1>
-            <p style="margin: 5px 0 0 0; color: #64748b;">Professional Invoicing System</p>
-        </div>
-        <div class="no-print">
-            <button class="btn btn-print" onclick="window.print()">🖨️ Print / Save PDF</button>
-        </div>
-    </div>
+<!-- Login Form -->
+<div id="login-screen">
+    <h2>Pin2 Kumar's Login</h2>
+    <input type="text" id="username" class="login-input" placeholder="Username (pintu450)">
+    <input type="password" id="password" class="login-input" placeholder="Password">
+    <button class="btn btn-add" style="width: 100%;" onclick="checkLogin()">Log In</button>
+    <p id="login-error" style="color: red; display: none; margin-top: 10px;">गलत Username या Password!</p>
+</div>
 
-    <!-- Customer & Bill Info -->
-    <div class="meta-grid">
-        <div class="input-group">
-            <label>Customer Name</label>
-            <input type="text" id="customerName" placeholder="Grahak ka naam">
+<!-- Main Application -->
+<div id="app-screen">
+    <div class="billing-container">
+        <div class="header">
+            <div>
+                <h1>Pin2 Kumar's BillMaster</h1>
+                <p style="margin: 5px 0 0 0; color: #64748b;">Nepali Invoicing System (रु)</p>
+            </div>
+            <div class="no-print button-zone">
+                <button class="btn btn-save" onclick="saveBillData()">💾 Save Bill</button>
+                <button class="btn btn-print" onclick="window.print()">🖨️ Print Invoice</button>
+            </div>
         </div>
-        <div class="input-group">
-            <label>Invoice Number</label>
-            <input type="text" id="invoiceNum" value="INV-1001">
-        </div>
-        <div class="input-group">
-            <label>Date</label>
-            <input type="date" id="invoiceDate">
-        </div>
-    </div>
 
-    <!-- Items Table -->
-    <table class="item-table" id="billTable">
-        <thead>
-            <tr>
-                <th>Item Description</th>
-                <th style="width: 120px;">Price (₹)</th>
-                <th style="width: 100px;">Quantity</th>
-                <th style="width: 120px;">Total (₹)</th>
-                <th class="no-print" style="width: 80px;">Action</th>
-            </tr>
-        </thead>
-        <tbody id="itemRows">
-            <!-- First Default Row -->
-            <tr>
-                <td><input type="text" class="item-desc" placeholder="Item ka naam" style="width:90%"></td>
-                <td><input type="number" class="item-price" value="0" oninput="calculateTotal()" style="width:80px"></td>
-                <td><input type="number" class="item-qty" value="1" oninput="calculateTotal()" style="width:60px"></td>
-                <td class="item-total">₹0.00</td>
-                <td class="no-print"><button class="btn btn-danger" onclick="deleteRow(this)">Delete</button></td>
-            </tr>
-        </tbody>
-    </table>
-
-    <button class="btn btn-add no-print" onclick="addRow()">➕ Add New Item</button>
-
-    <!-- Totals -->
-    <div class="totals-box">
-        <div class="totals-row">
-            <span>Subtotal:</span>
-            <span id="subTotal">₹0.00</span>
+        <div class="meta-grid">
+            <div class="input-group">
+                <label>Customer Name</label>
+                <input type="text" id="customerName" placeholder="Grahak ko naam">
+            </div>
+            <div class="input-group">
+                <label>Invoice Number</label>
+                <input type="text" id="invoiceNum" value="INV-2026-001">
+            </div>
+            <div class="input-group">
+                <label>Date (BS / AD)</label>
+                <input type="text" id="invoiceDate" placeholder="YYYY-MM-DD">
+            </div>
         </div>
-        <div class="totals-row">
-            <span>GST (18%):</span>
-            <span id="gstTotal">₹0.00</span>
-        </div>
-        <div class="totals-row grand-total">
-            <span>Grand Total:</span>
-            <span id="grandTotal">₹0.00</span>
+
+        <table class="item-table" id="billTable">
+            <thead>
+                <tr>
+                    <th>Item Description</th>
+                    <th style="width: 120px;">Price (रु)</th>
+                    <th style="width: 100px;">Quantity</th>
+                    <th style="width: 120px;">Total (रु)</th>
+                    <th class="no-print" style="width: 80px;">Action</th>
+                </tr>
+            </thead>
+            <tbody id="itemRows">
+                <tr>
+                    <td><input type="text" class="item-desc" placeholder="Saman ko naam" style="width:90%"></td>
+                    <td><input type="number" class="item-price" value="0" oninput="calculateTotal()" style="width:80px"></td>
+                    <td><input type="number" class="item-qty" value="1" oninput="calculateTotal()" style="width:60px"></td>
+                    <td class="item-total">रु 0.00</td>
+                    <td class="no-print"><button class="btn btn-danger" onclick="deleteRow(this)">Delete</button></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <button class="btn btn-add no-print" onclick="addRow()">➕ Add New Item</button>
+
+        <div class="totals-box">
+            <div class="totals-row">
+                <span>Subtotal:</span>
+                <span id="subTotal">रु 0.00</span>
+            </div>
+            <div class="totals-row">
+                <span>VAT / Tax (13%):</span>
+                <span id="gstTotal">रु 0.00</span>
+            </div>
+            <div class="totals-row grand-total">
+                <span>Grand Total:</span>
+                <span id="grandTotal">रु 0.00</span>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
-    // Set current date automatically
-    document.getElementById('invoiceDate').valueAsDate = new Date();
+    // Login Verification
+    function checkLogin() {
+        const u = document.getElementById('username').value;
+        const p = document.getElementById('password').value;
+        
+        // Match conditions exactly
+        if(u === "pintu450" && p === "15735928 a") {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('app-screen').style.display = 'block';
+            loadSavedData();
+        } else {
+            document.getElementById('login-error').style.display = 'block';
+        }
+    }
+
+    // Set Current Nepal Date Format Automatically
+    const today = new Date();
+    const formattedDate = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+    document.getElementById('invoiceDate').value = formattedDate;
 
     function addRow() {
         const tbody = document.getElementById('itemRows');
         const tr = document.createElement('tr');
         tr.innerHTML = `
-            <td><input type="text" class="item-desc" placeholder="Item ka naam" style="width:90%"></td>
+            <td><input type="text" class="item-desc" placeholder="Saman ko naam" style="width:90%"></td>
             <td><input type="number" class="item-price" value="0" oninput="calculateTotal()" style="width:80px"></td>
             <td><input type="number" class="item-qty" value="1" oninput="calculateTotal()" style="width:60px"></td>
-            <td class="item-total">₹0.00</td>
+            <td class="item-total">रु 0.00</td>
             <td class="no-print"><button class="btn btn-danger" onclick="deleteRow(this)">Delete</button></td>
         `;
         tbody.appendChild(tr);
@@ -218,7 +198,7 @@
             row.remove();
             calculateTotal();
         } else {
-            alert("Kam se kam ek item hona zaroori hai!");
+            alert("Kam se kam ek item rakhnu hos!");
         }
     }
 
@@ -231,16 +211,39 @@
             const qty = parseFloat(rows[i].querySelector('.item-qty').value) || 0;
             const total = price * qty;
             
-            rows[i].querySelector('.item-total').innerText = "₹" + total.toFixed(2);
+            rows[i].querySelector('.item-total').innerText = "रु " + total.toFixed(2);
             subtotal += total;
         }
 
-        const gst = subtotal * 0.18;
-        const grandTotal = subtotal + gst;
+        // Nepal Standard VAT is 13%
+        const vat = subtotal * 0.13;
+        const grandTotal = subtotal + vat;
 
-        document.getElementById('subTotal').innerText = "₹" + subtotal.toFixed(2);
-        document.getElementById('gstTotal').innerText = "₹" + gst.toFixed(2);
-        document.getElementById('grandTotal').innerText = "₹" + grandTotal.toFixed(2);
+        document.getElementById('subTotal').innerText = "रु " + subtotal.toFixed(2);
+        document.getElementById('gstTotal').innerText = "रु " + vat.toFixed(2);
+        document.getElementById('grandTotal').innerText = "रु " + grandTotal.toFixed(2);
+    }
+
+    // Save Data to Local Browser Storage
+    function saveBillData() {
+        const data = {
+            customer: document.getElementById('customerName').value,
+            invoiceNum: document.getElementById('invoiceNum').value,
+            date: document.getElementById('invoiceDate').value
+        };
+        localStorage.setItem('billMasterData', JSON.stringify(data));
+        alert("Bill secure tarika le save vayo! 💾");
+    }
+
+    // Load Data if previously saved
+    function loadSavedData() {
+        const saved = localStorage.getItem('billMasterData');
+        if(saved) {
+            const data = JSON.parse(saved);
+            document.getElementById('customerName').value = data.customer || '';
+            document.getElementById('invoiceNum').value = data.invoiceNum || 'INV-2026-001';
+            document.getElementById('invoiceDate').value = data.date || formattedDate;
+        }
     }
 </script>
 
