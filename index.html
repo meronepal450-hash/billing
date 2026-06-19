@@ -16,10 +16,10 @@
             font-family: 'Segoe UI', Arial, sans-serif;
             background-color: #f1f5f9;
             margin: 0;
-            padding: 20px;
+            padding: 0;
             color: var(--dark);
         }
-        /* Login Screen Styles */
+        /* Login Screen */
         #login-screen {
             max-width: 450px;
             margin: 100px auto;
@@ -38,8 +38,40 @@
             display: flex; align-items: center; justify-content: center;
             gap: 8px; margin-top: 10px; margin-bottom: 20px; font-size: 14px; color: #475569;
         }
-        /* Main App Styles */
+
+        /* Main App Layout */
         #app-screen { display: none; }
+        
+        /* Navigation Menu */
+        .nav-bar {
+            background-color: var(--primary);
+            padding: 10px 20px;
+            display: flex;
+            gap: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .nav-btn {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 15px;
+            transition: 0.2s;
+        }
+        .nav-btn.active, .nav-btn:hover {
+            background: white;
+            color: var(--primary);
+        }
+
+        /* Views */
+        .view-content { padding: 20px; }
+        .tab-view { display: none; }
+        .tab-view.active { display: block; }
+
+        /* Billing Form Styles */
         .billing-container {
             max-width: 900px;
             margin: auto;
@@ -47,12 +79,13 @@
             padding: 30px;
             border-radius: 12px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
         }
         .header {
             display: flex; justify-content: space-between; align-items: center;
             border-bottom: 2px solid #e2e8f0; padding-bottom: 20px; margin-bottom: 20px;
         }
-        .header h1 { margin: 0; color: var(--primary); font-size: 26px; }
+        .header h1 { margin: 0; color: var(--primary); font-size: 24px; }
         .meta-grid {
             display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 15px; margin-bottom: 30px;
@@ -69,14 +102,37 @@
         .btn-print { background-color: var(--success); color: white; }
         .btn-save { background-color: var(--save); color: white; }
         .btn-danger { background-color: #ef4444; color: white; padding: 5px 10px; font-size: 13px; }
+        .btn-view { background-color: #0284c7; color: white; padding: 4px 10px; font-size: 13px; border-radius: 4px; }
         .btn:hover { opacity: 0.9; transform: translateY(-1px); }
         .totals-box { width: 300px; margin-left: auto; margin-top: 20px; background: var(--light); padding: 15px; border-radius: 8px; }
         .totals-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 15px; }
         .grand-total { font-size: 18px; font-weight: bold; color: var(--primary); border-top: 1px solid #cbd5e1; padding-top: 10px; }
+
+        /* History Container */
+        .history-container {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        }
+        .history-container h3 { margin-top: 0; color: var(--primary); border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; }
+
+        /* Embedded Iframe Container */
+        .iframe-container {
+            width: 100%;
+            height: 82vh;
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            background: white;
+        }
+
         @media print {
+            .nav-bar, .no-print, .history-container, .btn-danger { display: none !important; }
             body { background: white; padding: 0; }
-            .billing-container { box-shadow: none; padding: 0; }
-            .no-print { display: none !important; }
+            .billing-container { box-shadow: none; padding: 0; margin-bottom: 0; }
             input { border: none; padding: 0; background: transparent; }
         }
     </style>
@@ -84,8 +140,8 @@
 <body>
 
 <!-- Login Form -->
-<div id="login-screen">
-    <h2>Pin2 Online Works and Photocopy Center</h2>
+<div id="login-screen" class="no-print">
+    <h2>Pin2 Kumar Online works and photocopy center</h2>
     <input type="text" id="username" class="login-input" placeholder="Username (pintu450)">
     <input type="password" id="password" class="login-input" placeholder="Password">
     
@@ -99,79 +155,115 @@
     <p id="login-error" style="color: red; display: none; margin-top: 10px;">गलत Username या Password!</p>
 </div>
 
-<!-- Main Application -->
+<!-- Main Application Dashboard -->
 <div id="app-screen">
-    <div class="billing-container">
-        <div class="header">
-            <div>
-                <h1>Pin2 Kumar Online works and photocopy center</h1>
-                <p style="margin: 5px 0 0 0; color: #64748b;">Nepali Invoicing System (रु)</p>
+    <!-- Navbar Tabs -->
+    <div class="nav-bar no-print">
+        <button class="nav-btn active" onclick="switchTab('billing-tab', this)">🧾 Nepali Bill System</button>
+        <button class="nav-btn" onclick="switchTab('portfolio-tab', this)">🌐 My Portfolio Page</button>
+    </div>
+
+    <div class="view-content">
+        <!-- TAB 1: Billing System -->
+        <div id="billing-tab" class="tab-view active">
+            <div class="billing-container">
+                <div class="header">
+                    <div>
+                        <h1>Pin2 Kumar Online works and photocopy center</h1>
+                        <p style="margin: 5px 0 0 0; color: #64748b;">Nepali Invoicing System (रु)</p>
+                    </div>
+                    <div class="no-print button-zone">
+                        <button class="btn btn-save" onclick="saveCurrentBill()">💾 Save Bill</button>
+                        <button class="btn btn-print" onclick="window.print()">🖨️ Print Invoice</button>
+                    </div>
+                </div>
+
+                <div class="meta-grid">
+                    <div class="input-group">
+                        <label>Customer Name</label>
+                        <input type="text" id="customerName" placeholder="Grahak ko naam">
+                    </div>
+                    <div class="input-group">
+                        <label>Invoice Number</label>
+                        <input type="text" id="invoiceNum" value="INV-2026-001">
+                    </div>
+                    <div class="input-group">
+                        <label>Date (BS / AD)</label>
+                        <input type="text" id="invoiceDate" placeholder="YYYY-MM-DD">
+                    </div>
+                </div>
+
+                <table class="item-table" id="billTable">
+                    <thead>
+                        <tr>
+                            <th>Item Description</th>
+                            <th style="width: 120px;">Price (रु)</th>
+                            <th style="width: 100px;">Quantity</th>
+                            <th style="width: 120px;">Total (रु)</th>
+                            <th class="no-print" style="width: 80px;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="itemRows">
+                        <tr>
+                            <td><input type="text" class="item-desc" placeholder="Saman ko naam" style="width:90%"></td>
+                            <td><input type="number" class="item-price" value="0" oninput="calculateTotal()" style="width:80px"></td>
+                            <td><input type="number" class="item-qty" value="1" oninput="calculateTotal()" style="width:60px"></td>
+                            <td class="item-total">रु 0.00</td>
+                            <td class="no-print"><button class="btn btn-danger" onclick="deleteRow(this)">Delete</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <button class="btn btn-add no-print" onclick="addRow()">➕ Add New Item</button>
+
+                <div class="totals-box">
+                    <div class="totals-row grand-total">
+                        <span>Grand Total:</span>
+                        <span id="grandTotal">रु 0.00</span>
+                    </div>
+                </div>
             </div>
-            <div class="no-print button-zone">
-                <button class="btn btn-save" onclick="saveBillData()">💾 Save Bill</button>
-                <button class="btn btn-print" onclick="window.print()">🖨️ Print Invoice</button>
+
+            <!-- New Section: Saved Bills Log -->
+            <div class="history-container no-print">
+                <h3>📜 Saved Bills History (Pichle Saare Bills)</h3>
+                <table class="item-table">
+                    <thead>
+                        <tr>
+                            <th>Invoice No.</th>
+                            <th>Customer Name</th>
+                            <th>Date</th>
+                            <th>Total Amount</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyRows">
+                        <!-- Yahan bache huye bills dikhenge -->
+                    </tbody>
+                </table>
             </div>
         </div>
 
-        <div class="meta-grid">
-            <div class="input-group">
-                <label>Customer Name</label>
-                <input type="text" id="customerName" placeholder="Grahak ko naam">
-            </div>
-            <div class="input-group">
-                <label>Invoice Number</label>
-                <input type="text" id="invoiceNum" value="INV-2026-001">
-            </div>
-            <div class="input-group">
-                <label>Date (BS / AD)</label>
-                <input type="text" id="invoiceDate" placeholder="YYYY-MM-DD">
-            </div>
-        </div>
-
-        <table class="item-table" id="billTable">
-            <thead>
-                <tr>
-                    <th>Item Description</th>
-                    <th style="width: 120px;">Price (रु)</th>
-                    <th style="width: 100px;">Quantity</th>
-                    <th style="width: 120px;">Total (रु)</th>
-                    <th class="no-print" style="width: 80px;">Action</th>
-                </tr>
-            </thead>
-            <tbody id="itemRows">
-                <tr>
-                    <td><input type="text" class="item-desc" placeholder="Saman ko naam" style="width:90%"></td>
-                    <td><input type="number" class="item-price" value="0" oninput="calculateTotal()" style="width:80px"></td>
-                    <td><input type="number" class="item-qty" value="1" oninput="calculateTotal()" style="width:60px"></td>
-                    <td class="item-total">रु 0.00</td>
-                    <td class="no-print"><button class="btn btn-danger" onclick="deleteRow(this)">Delete</button></td>
-                </tr>
-            </tbody>
-        </table>
-
-        <button class="btn btn-add no-print" onclick="addRow()">➕ Add New Item</button>
-
-        <div class="totals-box">
-            <div class="totals-row grand-total">
-                <span>Grand Total:</span>
-                <span id="grandTotal">रु 0.00</span>
-            </div>
+        <!-- TAB 2: Embedded Portfolio -->
+        <div id="portfolio-tab" class="tab-view">
+            <iframe class="iframe-container" src="https://pk6467468-prog.github.io/Pintu-Kumar/"></iframe>
         </div>
     </div>
 </div>
 
 <script>
-    // Automatically check if 'Remember Me' was active last time
+    // Global array to store history
+    let billsHistory = [];
+
     window.onload = function() {
         const remembered = localStorage.getItem('rememberedUser');
         if (remembered === "true") {
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('app-screen').style.display = 'block';
-            loadSavedData();
+            loadHistory();
         }
     };
 
-    // Login Verification
     function checkLogin() {
         const u = document.getElementById('username').value;
         const p = document.getElementById('password').value;
@@ -183,13 +275,19 @@
             }
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('app-screen').style.display = 'block';
-            loadSavedData();
+            loadHistory();
         } else {
             document.getElementById('login-error').style.display = 'block';
         }
     }
 
-    // Set Current Nepal Date Format Automatically
+    function switchTab(tabId, btn) {
+        document.querySelectorAll('.tab-view').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        btn.classList.add('active');
+    }
+
     const today = new Date();
     const formattedDate = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
     document.getElementById('invoiceDate').value = formattedDate;
@@ -230,29 +328,113 @@
             rows[i].querySelector('.item-total').innerText = "रु " + total.toFixed(2);
             subtotal += total;
         }
-
         document.getElementById('grandTotal').innerText = "रु " + subtotal.toFixed(2);
+        return subtotal.toFixed(2);
     }
 
-    // Save Data to Local Browser Storage
-    function saveBillData() {
-        const data = {
-            customer: document.getElementById('customerName').value,
-            invoiceNum: document.getElementById('invoiceNum').value,
-            date: document.getElementById('invoiceDate').value
+    // Save current bill into history list
+    function saveCurrentBill() {
+        const totalAmt = calculateTotal();
+        const invoiceNum = document.getElementById('invoiceNum').value;
+        const customerName = document.getElementById('customerName').value;
+        const invoiceDate = document.getElementById('invoiceDate').value;
+
+        // Gather table items data
+        const rows = document.getElementById('itemRows').rows;
+        let items = [];
+        for(let i=0; i<rows.length; i++) {
+            items.push({
+                desc: rows[i].querySelector('.item-desc').value,
+                price: rows[i].querySelector('.item-price').value,
+                qty: rows[i].querySelector('.item-qty').value
+            });
+        }
+
+        const newBill = {
+            id: Date.now(),
+            invoiceNum: invoiceNum,
+            customerName: customerName,
+            date: invoiceDate,
+            total: totalAmt,
+            items: items
         };
-        localStorage.setItem('billMasterData', JSON.stringify(data));
-        alert("Bill secure tarika le save vayo! 💾");
+
+        billsHistory.push(newBill);
+        localStorage.setItem('pin2_bills_history', JSON.stringify(billsHistory));
+        
+        renderHistoryTable();
+        alert("Bill safe vayo ra history ma thapiyo! 💾");
     }
 
-    // Load Data if previously saved
-    function loadSavedData() {
-        const saved = localStorage.getItem('billMasterData');
-        if(saved) {
-            const data = JSON.parse(saved);
-            document.getElementById('customerName').value = data.customer || '';
-            document.getElementById('invoiceNum').value = data.invoiceNum || 'INV-2026-001';
-            document.getElementById('invoiceDate').value = data.date || formattedDate;
+    // Load History list from local storage
+    function loadHistory() {
+        const savedHistory = localStorage.getItem('pin2_bills_history');
+        if(savedHistory) {
+            billsHistory = JSON.parse(savedHistory);
+            renderHistoryTable();
+        }
+    }
+
+    // Render History table rows
+    function renderHistoryTable() {
+        const tbody = document.getElementById('historyRows');
+        tbody.innerHTML = '';
+        
+        if(billsHistory.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#94a3b8;">Kunai pani bill save kariyeko chaina.</td></tr>`;
+            return;
+        }
+
+        billsHistory.forEach((bill, index) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><b>${bill.invoiceNum}</b></td>
+                <td>${bill.customerName || 'N/A'}</td>
+                <td>${bill.date}</td>
+                <td>रु ${bill.total}</td>
+                <td>
+                    <button class="btn-view" onclick="viewOldBill(${bill.id})">🔍 View</button>
+                    <button class="btn-danger" style="padding: 2px 6px; font-size:11px;" onclick="deleteFromHistory(${bill.id})">X</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    // Populate old bill into inputs when 'View' is clicked
+    function viewOldBill(billId) {
+        const bill = billsHistory.find(b => b.id === billId);
+        if(!bill) return;
+
+        document.getElementById('customerName').value = bill.customerName;
+        document.getElementById('invoiceNum').value = bill.invoiceNum;
+        document.getElementById('invoiceDate').value = bill.date;
+
+        const tbody = document.getElementById('itemRows');
+        tbody.innerHTML = ''; // Clear current rows
+
+        bill.items.forEach(item => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><input type="text" class="item-desc" value="${item.desc}" style="width:90%"></td>
+                <td><input type="number" class="item-price" value="${item.price}" oninput="calculateTotal()" style="width:80px"></td>
+                <td><input type="number" class="item-qty" value="${item.qty}" oninput="calculateTotal()" style="width:60px"></td>
+                <td class="item-total">रु 0.00</td>
+                <td class="no-print"><button class="btn btn-danger" onclick="deleteRow(this)">Delete</button></td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        calculateTotal();
+        window.scrollTo({top: 0, behavior: 'smooth'}); // Scroll to top to see bill
+    }
+
+    // Delete item from history list
+    function deleteFromHistory(billId) {
+        if(confirm("Kyo yo bill history bata hatauna chahanuhunchha?")) {
+            billsHistory = billsHistory.filter(b => b.id !== billId);
+            localStorage.setItem('pin2_bills_history', JSON.stringify(billsHistory));
+            renderHistoryTable();
         }
     }
 </script>
