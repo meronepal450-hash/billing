@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pin2 Kumar's Nepali BillMaster</title>
+    <title>Pin2 Kumar Online works and photocopy center</title>
     <style>
         :root {
             --primary: #1e3a8a;
@@ -21,7 +21,7 @@
         }
         /* Login Screen Styles */
         #login-screen {
-            max-width: 400px;
+            max-width: 450px;
             margin: 100px auto;
             background: white;
             padding: 30px;
@@ -29,10 +29,14 @@
             box-shadow: 0 4px 20px rgba(0,0,0,0.1);
             text-align: center;
         }
-        #login-screen h2 { color: var(--primary); margin-bottom: 20px; }
+        #login-screen h2 { color: var(--primary); margin-bottom: 20px; font-size: 22px; line-height: 1.4; }
         .login-input {
             width: 90%; padding: 10px; margin-bottom: 15px;
             border: 1px solid #cbd5e1; border-radius: 6px; font-size: 16px;
+        }
+        .remember-group {
+            display: flex; align-items: center; justify-content: center;
+            gap: 8px; margin-top: 10px; margin-bottom: 20px; font-size: 14px; color: #475569;
         }
         /* Main App Styles */
         #app-screen { display: none; }
@@ -48,7 +52,7 @@
             display: flex; justify-content: space-between; align-items: center;
             border-bottom: 2px solid #e2e8f0; padding-bottom: 20px; margin-bottom: 20px;
         }
-        .header h1 { margin: 0; color: var(--primary); font-size: 28px; }
+        .header h1 { margin: 0; color: var(--primary); font-size: 26px; }
         .meta-grid {
             display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 15px; margin-bottom: 30px;
@@ -81,10 +85,17 @@
 
 <!-- Login Form -->
 <div id="login-screen">
-    <h2>Pin2 Kumar's Login</h2>
+    <h2>Pin2 Online Works and Photocopy Center</h2>
     <input type="text" id="username" class="login-input" placeholder="Username (pintu450)">
     <input type="password" id="password" class="login-input" placeholder="Password">
+    
     <button class="btn btn-add" style="width: 100%;" onclick="checkLogin()">Log In</button>
+    
+    <div class="remember-group">
+        <input type="checkbox" id="rememberMe">
+        <label for="rememberMe">Remember Me</label>
+    </div>
+    
     <p id="login-error" style="color: red; display: none; margin-top: 10px;">गलत Username या Password!</p>
 </div>
 
@@ -93,7 +104,7 @@
     <div class="billing-container">
         <div class="header">
             <div>
-                <h1>Pin2 Kumar's BillMaster</h1>
+                <h1>Pin2 Kumar Online works and photocopy center</h1>
                 <p style="margin: 5px 0 0 0; color: #64748b;">Nepali Invoicing System (रु)</p>
             </div>
             <div class="no-print button-zone">
@@ -141,14 +152,6 @@
         <button class="btn btn-add no-print" onclick="addRow()">➕ Add New Item</button>
 
         <div class="totals-box">
-            <div class="totals-row">
-                <span>Subtotal:</span>
-                <span id="subTotal">रु 0.00</span>
-            </div>
-            <div class="totals-row">
-                <span>VAT / Tax (13%):</span>
-                <span id="gstTotal">रु 0.00</span>
-            </div>
             <div class="totals-row grand-total">
                 <span>Grand Total:</span>
                 <span id="grandTotal">रु 0.00</span>
@@ -158,13 +161,26 @@
 </div>
 
 <script>
+    // Automatically check if 'Remember Me' was active last time
+    window.onload = function() {
+        const remembered = localStorage.getItem('rememberedUser');
+        if (remembered === "true") {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('app-screen').style.display = 'block';
+            loadSavedData();
+        }
+    };
+
     // Login Verification
     function checkLogin() {
         const u = document.getElementById('username').value;
         const p = document.getElementById('password').value;
+        const rememberMe = document.getElementById('rememberMe').checked;
         
-        // Match conditions exactly
-        if(u === "pintu450" && p === "15735928 a") {
+        if(u === "pintu450" && p === "15735928") {
+            if(rememberMe) {
+                localStorage.setItem('rememberedUser', "true");
+            }
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('app-screen').style.display = 'block';
             loadSavedData();
@@ -215,13 +231,7 @@
             subtotal += total;
         }
 
-        // Nepal Standard VAT is 13%
-        const vat = subtotal * 0.13;
-        const grandTotal = subtotal + vat;
-
-        document.getElementById('subTotal').innerText = "रु " + subtotal.toFixed(2);
-        document.getElementById('gstTotal').innerText = "रु " + vat.toFixed(2);
-        document.getElementById('grandTotal').innerText = "रु " + grandTotal.toFixed(2);
+        document.getElementById('grandTotal').innerText = "रु " + subtotal.toFixed(2);
     }
 
     // Save Data to Local Browser Storage
