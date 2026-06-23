@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pin2 Kumar Online works and photocopy center</title>
+    <title>AR Bibidh Sewa - Nepali Bill System</title>
     <style>
         :root {
             --primary: #1e3a8a;
@@ -28,7 +28,7 @@
             left: 0;
             width: 100vw;
             height: 100vh;
-            background-image: url('login-bg.png'); /* Upload your image as login-bg.png to GitHub */
+            background-image: url('login-bg.png');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -40,8 +40,8 @@
         .login-box {
             max-width: 420px;
             width: 90%;
-            background: rgba(255, 255, 255, 0.85); /* Transparent glass effect */
-            backdrop-filter: blur(10px); /* Blur effect behind box */
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             padding: 35px 30px;
             border-radius: 16px;
@@ -52,11 +52,14 @@
         .login-box h2 { 
             color: var(--primary); 
             margin-top: 0;
-            margin-bottom: 25px; 
-            font-size: 22px; 
-            line-height: 1.4;
+            margin-bottom: 5px; 
+            font-size: 24px; 
             font-weight: bold;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        .login-box p {
+            margin: 0 0 20px 0;
+            font-size: 14px;
+            color: #475569;
         }
         .login-input {
             width: 100%; 
@@ -154,7 +157,9 @@
         .header {
             border-bottom: 2px solid #e2e8f0; padding-bottom: 15px; margin-bottom: 20px;
         }
-        .header h1 { margin: 0; color: var(--primary); font-size: 24px; }
+        .header h1 { margin: 0; color: var(--primary); font-size: 28px; }
+        .header p { margin: 5px 0 0 0; color: #475569; font-size: 14px; line-height: 1.5; }
+        
         .meta-grid {
             display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 15px; margin-bottom: 25px;
@@ -245,10 +250,11 @@
 </head>
 <body>
 
-<!-- Login Form Area with Fullscreen Background Banner -->
+<!-- Login Form Area -->
 <div id="login-screen" class="no-print">
     <div class="login-box">
-        <h2>Pin2 Kumar Online works and photocopy center</h2>
+        <h2>AR Bibidh Sewa</h2>
+        <p>Susta 02, Kudiya, Nawalparasi</p>
         <input type="text" id="username" class="login-input" placeholder="Username (pintu450)">
         <input type="password" id="password" class="login-input" placeholder="Password">
         
@@ -279,8 +285,11 @@
         <div id="billing-tab" class="tab-view active">
             <div class="billing-container">
                 <div class="header">
-                    <h1>Pin2 Kumar Online works and photocopy center</h1>
-                    <p style="margin: 5px 0 0 0; color: #64748b;">Nepali Invoicing & Credit Ledger System (रु)</p>
+                    <h1>AR Bibidh Sewa</h1>
+                    <p>
+                        <b>📍 Address:</b> Susta 02 Kudiya, Nawalparasi (Near Ward No. 2 Office)<br>
+                        <b>📞 Contact:</b> 9817488390 | <b>✉️ Email:</b> pk6467468@gmail.com
+                    </p>
                 </div>
 
                 <div class="meta-grid">
@@ -296,7 +305,6 @@
                         <label>Date (YYYY-MM-DD)</label>
                         <input type="text" id="invoiceDate" placeholder="YYYY-MM-DD">
                     </div>
-                    <!-- Naya Feature: Payment Status (Udhar/Paid) -->
                     <div class="input-group">
                         <label>Payment Status</label>
                         <select id="paymentStatus" onchange="toggleCreditInput()">
@@ -304,7 +312,6 @@
                             <option value="Credit">Udhar / Credit (उधारो)</option>
                         </select>
                     </div>
-                    <!-- Naya Feature: Kitna Udhar Baki hai box -->
                     <div class="input-group" id="creditAmountGroup" style="display: none;">
                         <label>Udhar Amount (रु)</label>
                         <input type="number" id="creditAmount" value="0" placeholder="Baki bacha udhar">
@@ -322,11 +329,10 @@
                         </tr>
                     </thead>
                     <tbody id="itemRows">
-                        <!-- Pehli row automatically inject hogi -->
+                        <!-- Rows dynamically added here -->
                     </tbody>
                 </table>
 
-                <!-- Bottom Row containing all Actions side-by-side -->
                 <div class="action-bar-bottom">
                     <div class="no-print button-zone">
                         <button class="btn btn-add" onclick="addRow()">➕ Add New Item</button>
@@ -392,7 +398,6 @@
 <script>
     let billsHistory = [];
 
-    // Master Product List (Jo aapne photo 'ChatGPT Image Jun 4, 2026, 10_29_19 PM.png' me di hai)
     const productPreset = [
         { name: "Photocopy", price: 10 },
         { name: "P.P Photo (6 Copies)", price: 150 },
@@ -406,7 +411,6 @@
     ];
 
     window.onload = function() {
-        // ID password check agar pehle se saved hai toh input fields me bhar dega
         const savedU = localStorage.getItem('savedUsername');
         const savedP = localStorage.getItem('savedPassword');
         if(savedU && savedP) {
@@ -415,7 +419,6 @@
             document.getElementById('rememberMe').checked = true;
         }
 
-        // Auto login block kiya taaki button daba kar hi khule
         const loginSession = sessionStorage.getItem('loginActive');
         if (loginSession === "true") {
             document.getElementById('login-screen').style.display = 'none';
@@ -440,7 +443,6 @@
         
         if(u === "pintu450" && p === "15735928") {
             if(rememberMe) {
-                // Agar remember me checked hai toh local me save rahega
                 localStorage.setItem('savedUsername', u);
                 localStorage.setItem('savedPassword', p);
             } else {
@@ -448,7 +450,6 @@
                 localStorage.removeItem('savedPassword');
             }
             
-            // Session banaya taaki page reload par baar baar login na mange jab tak browser khula hai
             sessionStorage.setItem('loginActive', "true");
             
             document.getElementById('login-screen').style.display = 'none';
@@ -466,7 +467,6 @@
             document.getElementById('app-screen').style.display = 'none';
             document.getElementById('login-screen').style.display = 'flex';
             
-            // Agar remember checked hai toh text boxes me value bachi rahegi par screen lock ho jayegi
             const savedU = localStorage.getItem('savedUsername');
             const savedP = localStorage.getItem('savedPassword');
             document.getElementById('username').value = savedU ? savedU : "";
@@ -481,7 +481,7 @@
         
         if(status === "Credit") {
             creditGroup.style.display = "flex";
-            document.getElementById('creditAmount').value = gTotal; // Default me full amount udhar
+            document.getElementById('creditAmount').value = gTotal;
         } else {
             creditGroup.style.display = "none";
             document.getElementById('creditAmount').value = 0;
@@ -568,7 +568,6 @@
         }
         document.getElementById('grandTotal').innerText = "रु " + subtotal.toFixed(2);
         
-        // Auto update credit box if visible
         if(document.getElementById('paymentStatus').value === "Credit") {
             document.getElementById('creditAmount').value = subtotal.toFixed(2);
         }
@@ -657,7 +656,6 @@
             const diffTime = todayObj - billDate;
             const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
-            // Kamai sirf unhi paison ki jodenge jo cash mila (Total - Credit)
             const receivedAmount = bill.total - (bill.creditDue || 0);
 
             if (bill.date === todayStr) {
