@@ -12,6 +12,7 @@
             --new-btn: #2563eb;
             --dark: #1e293b;
             --light: #f8fafc;
+            --danger: #ef4444;
         }
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
@@ -97,8 +98,13 @@
             background-color: var(--primary);
             padding: 10px 20px;
             display: flex;
-            gap: 15px;
+            justify-content: space-between;
+            align-items: center;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .nav-tabs {
+            display: flex;
+            gap: 15px;
         }
         .nav-btn {
             background: rgba(255,255,255,0.1);
@@ -115,6 +121,20 @@
             background: white;
             color: var(--primary);
         }
+        .logout-btn {
+            background-color: var(--danger);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+        .logout-btn:hover {
+            background-color: #b91c1c;
+        }
 
         /* Views */
         .view-content { padding: 20px; }
@@ -123,7 +143,7 @@
 
         /* Billing Form Styles */
         .billing-container {
-            max-width: 900px;
+            max-width: 950px;
             margin: auto;
             background: white;
             padding: 30px;
@@ -132,20 +152,30 @@
             margin-bottom: 30px;
         }
         .header {
-            display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 2px solid #e2e8f0; padding-bottom: 20px; margin-bottom: 20px;
+            border-bottom: 2px solid #e2e8f0; padding-bottom: 15px; margin-bottom: 20px;
         }
         .header h1 { margin: 0; color: var(--primary); font-size: 24px; }
         .meta-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px; margin-bottom: 30px;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px; margin-bottom: 25px;
         }
         .input-group { display: flex; flex-direction: column; }
         .input-group label { font-size: 14px; font-weight: 600; margin-bottom: 5px; color: #64748b; }
         input, select { padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 15px; }
+        
         .item-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
         .item-table th { background-color: var(--light); text-align: left; padding: 12px; border-bottom: 2px solid #e2e8f0; }
         .item-table td { padding: 10px; border-bottom: 1px solid #e2e8f0; vertical-align: middle; }
+        
+        /* Actions Bottom Row Control */
+        .action-bar-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 10px;
+        }
         .button-zone { display: flex; gap: 10px; flex-wrap: wrap; }
         .btn { padding: 10px 20px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; }
         .btn-add { background-color: var(--primary); color: white; }
@@ -155,13 +185,14 @@
         .btn-danger { background-color: #ef4444; color: white; padding: 5px 10px; font-size: 13px; border: none; border-radius: 4px; cursor: pointer; }
         .btn-view { background-color: #0284c7; color: white; padding: 4px 10px; font-size: 13px; border-radius: 4px; border: none; cursor: pointer; }
         .btn:hover { opacity: 0.9; transform: translateY(-1px); }
-        .totals-box { width: 300px; margin-left: auto; margin-top: 20px; background: var(--light); padding: 15px; border-radius: 8px; }
-        .totals-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 15px; }
-        .grand-total { font-size: 18px; font-weight: bold; color: var(--primary); border-top: 1px solid #cbd5e1; padding-top: 10px; }
+        
+        .totals-box { width: 300px; background: var(--light); padding: 15px; border-radius: 8px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); }
+        .totals-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 15px; }
+        .grand-total { font-size: 18px; font-weight: bold; color: var(--primary); border-top: 1px solid #cbd5e1; padding-top: 8px; margin-top: 5px; }
 
         /* Dashboard & History Container */
         .history-container {
-            max-width: 900px;
+            max-width: 950px;
             margin: auto;
             background: white;
             padding: 20px;
@@ -189,6 +220,11 @@
         .card h4 { margin: 0 0 10px 0; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.9; }
         .card .amount { font-size: 26px; font-weight: bold; }
 
+        /* Status badges */
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
+        .badge-paid { background-color: #dcfce7; color: #15803d; }
+        .badge-credit { background-color: #fee2e2; color: #b91c1c; }
+
         /* Embedded Iframe Container */
         .iframe-container {
             width: 100%;
@@ -200,9 +236,9 @@
         }
 
         @media print {
-            .nav-bar, .no-print, .history-container, .btn-danger, .analytics-grid { display: none !important; }
+            .nav-bar, .no-print, .history-container, .btn-danger, .analytics-grid, .action-bar-bottom { display: none !important; }
             body { background: white; padding: 0; }
-            .billing-container { box-shadow: none; padding: 0; margin-bottom: 0; }
+            .billing-container { box-shadow: none; padding: 0; margin-bottom: 0; max-width: 100%; }
             input, select { border: none; padding: 0; background: transparent; appearance: none; -webkit-appearance: none; color: black !important; }
         }
     </style>
@@ -220,7 +256,7 @@
         
         <div class="remember-group">
             <input type="checkbox" id="rememberMe">
-            <label for="rememberMe">Remember Me</label>
+            <label for="rememberMe">Remember Me (ID/PW Save Rakhne)</label>
         </div>
         
         <p id="login-error" style="color: #ef4444; font-weight: bold; display: none; margin-top: 10px; margin-bottom: 0;">गलत Username या Password!</p>
@@ -229,10 +265,13 @@
 
 <!-- Main Application Dashboard -->
 <div id="app-screen">
-    <!-- Navbar Tabs -->
+    <!-- Navbar Tabs with Logout Button -->
     <div class="nav-bar no-print">
-        <button class="nav-btn active" onclick="switchTab('billing-tab', this)">🧾 Nepali Bill System</button>
-        <button class="nav-btn" onclick="switchTab('portfolio-tab', this)">🌐 My Portfolio Page</button>
+        <div class="nav-tabs">
+            <button class="nav-btn active" onclick="switchTab('billing-tab', this)">🧾 Nepali Bill System</button>
+            <button class="nav-btn" onclick="switchTab('portfolio-tab', this)">🌐 My Portfolio Page</button>
+        </div>
+        <button class="logout-btn" onclick="triggerLogout()">❌ Log Out</button>
     </div>
 
     <div class="view-content">
@@ -240,15 +279,8 @@
         <div id="billing-tab" class="tab-view active">
             <div class="billing-container">
                 <div class="header">
-                    <div>
-                        <h1>Pin2 Kumar Online works and photocopy center</h1>
-                        <p style="margin: 5px 0 0 0; color: #64748b;">Nepali Invoicing System (रु)</p>
-                    </div>
-                    <div class="no-print button-zone">
-                        <button class="btn btn-new" onclick="clearFormForNewBill()">🆕 New Bill</button>
-                        <button class="btn btn-save" onclick="saveCurrentBill()">💾 Save Bill</button>
-                        <button class="btn btn-print" onclick="window.print()">🖨️ Print Invoice</button>
-                    </div>
+                    <h1>Pin2 Kumar Online works and photocopy center</h1>
+                    <p style="margin: 5px 0 0 0; color: #64748b;">Nepali Invoicing & Credit Ledger System (रु)</p>
                 </div>
 
                 <div class="meta-grid">
@@ -264,6 +296,19 @@
                         <label>Date (YYYY-MM-DD)</label>
                         <input type="text" id="invoiceDate" placeholder="YYYY-MM-DD">
                     </div>
+                    <!-- Naya Feature: Payment Status (Udhar/Paid) -->
+                    <div class="input-group">
+                        <label>Payment Status</label>
+                        <select id="paymentStatus" onchange="toggleCreditInput()">
+                            <option value="Paid">Paid (पूरा बुझाएको)</option>
+                            <option value="Credit">Udhar / Credit (उधारो)</option>
+                        </select>
+                    </div>
+                    <!-- Naya Feature: Kitna Udhar Baki hai box -->
+                    <div class="input-group" id="creditAmountGroup" style="display: none;">
+                        <label>Udhar Amount (रु)</label>
+                        <input type="number" id="creditAmount" value="0" placeholder="Baki bacha udhar">
+                    </div>
                 </div>
 
                 <table class="item-table" id="billTable">
@@ -277,16 +322,24 @@
                         </tr>
                     </thead>
                     <tbody id="itemRows">
-                        <!-- Pehli row functions ke through inject hogi -->
+                        <!-- Pehli row automatically inject hogi -->
                     </tbody>
                 </table>
 
-                <button class="btn btn-add no-print" onclick="addRow()">➕ Add New Item</button>
+                <!-- Bottom Row containing all Actions side-by-side -->
+                <div class="action-bar-bottom">
+                    <div class="no-print button-zone">
+                        <button class="btn btn-add" onclick="addRow()">➕ Add New Item</button>
+                        <button class="btn btn-new" onclick="clearFormForNewBill()">🆕 New Bill</button>
+                        <button class="btn btn-save" onclick="saveCurrentBill()">💾 Save Bill</button>
+                        <button class="btn btn-print" onclick="window.print()">🖨️ Print Invoice</button>
+                    </div>
 
-                <div class="totals-box">
-                    <div class="totals-row grand-total">
-                        <span>Grand Total:</span>
-                        <span id="grandTotal">रु 0.00</span>
+                    <div class="totals-box">
+                        <div class="totals-row grand-total">
+                            <span>Grand Total:</span>
+                            <span id="grandTotal">रु 0.00</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -309,7 +362,7 @@
                     </div>
                 </div>
 
-                <h3>📜 Saved Bills History</h3>
+                <h3>📜 Saved Bills & Udhar Khata History</h3>
                 <table class="item-table">
                     <thead>
                         <tr>
@@ -317,6 +370,8 @@
                             <th>Customer Name</th>
                             <th>Date</th>
                             <th>Total Amount</th>
+                            <th>Status</th>
+                            <th>Udhar Baki (रु)</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -351,12 +406,23 @@
     ];
 
     window.onload = function() {
-        const remembered = localStorage.getItem('rememberedUser');
-        if (remembered === "true") {
+        // ID password check agar pehle se saved hai toh input fields me bhar dega
+        const savedU = localStorage.getItem('savedUsername');
+        const savedP = localStorage.getItem('savedPassword');
+        if(savedU && savedP) {
+            document.getElementById('username').value = savedU;
+            document.getElementById('password').value = savedP;
+            document.getElementById('rememberMe').checked = true;
+        }
+
+        // Auto login block kiya taaki button daba kar hi khule
+        const loginSession = sessionStorage.getItem('loginActive');
+        if (loginSession === "true") {
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('app-screen').style.display = 'block';
             loadHistory();
         }
+        
         setCurrentDate();
         addRow();
     };
@@ -374,13 +440,51 @@
         
         if(u === "pintu450" && p === "15735928") {
             if(rememberMe) {
-                localStorage.setItem('rememberedUser', "true");
+                // Agar remember me checked hai toh local me save rahega
+                localStorage.setItem('savedUsername', u);
+                localStorage.setItem('savedPassword', p);
+            } else {
+                localStorage.removeItem('savedUsername');
+                localStorage.removeItem('savedPassword');
             }
+            
+            // Session banaya taaki page reload par baar baar login na mange jab tak browser khula hai
+            sessionStorage.setItem('loginActive', "true");
+            
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('app-screen').style.display = 'block';
+            document.getElementById('login-error').style.display = 'none';
             loadHistory();
         } else {
             document.getElementById('login-error').style.display = 'block';
+        }
+    }
+
+    function triggerLogout() {
+        if(confirm("Kya aap sach me Log Out garna chahanuhunchha?")) {
+            sessionStorage.removeItem('loginActive');
+            document.getElementById('app-screen').style.display = 'none';
+            document.getElementById('login-screen').style.display = 'flex';
+            
+            // Agar remember checked hai toh text boxes me value bachi rahegi par screen lock ho jayegi
+            const savedU = localStorage.getItem('savedUsername');
+            const savedP = localStorage.getItem('savedPassword');
+            document.getElementById('username').value = savedU ? savedU : "";
+            document.getElementById('password').value = savedP ? savedP : "";
+        }
+    }
+
+    function toggleCreditInput() {
+        const status = document.getElementById('paymentStatus').value;
+        const creditGroup = document.getElementById('creditAmountGroup');
+        const gTotal = parseFloat(document.getElementById('grandTotal').innerText.replace('रु ', '')) || 0;
+        
+        if(status === "Credit") {
+            creditGroup.style.display = "flex";
+            document.getElementById('creditAmount').value = gTotal; // Default me full amount udhar
+        } else {
+            creditGroup.style.display = "none";
+            document.getElementById('creditAmount').value = 0;
         }
     }
 
@@ -463,11 +567,19 @@
             subtotal += total;
         }
         document.getElementById('grandTotal').innerText = "रु " + subtotal.toFixed(2);
+        
+        // Auto update credit box if visible
+        if(document.getElementById('paymentStatus').value === "Credit") {
+            document.getElementById('creditAmount').value = subtotal.toFixed(2);
+        }
         return subtotal.toFixed(2);
     }
 
     function clearFormForNewBill() {
         document.getElementById('customerName').value = '';
+        document.getElementById('paymentStatus').value = 'Paid';
+        document.getElementById('creditAmountGroup').style.display = 'none';
+        document.getElementById('creditAmount').value = '0';
         
         const lastInv = document.getElementById('invoiceNum').value;
         const match = lastInv.match(/(\d+)$/);
@@ -490,6 +602,8 @@
         const invoiceNum = document.getElementById('invoiceNum').value;
         const customerName = document.getElementById('customerName').value;
         const invoiceDate = document.getElementById('invoiceDate').value;
+        const payStatus = document.getElementById('paymentStatus').value;
+        const credAmt = payStatus === "Credit" ? (parseFloat(document.getElementById('creditAmount').value) || 0) : 0;
 
         const rows = document.getElementById('itemRows').rows;
         let items = [];
@@ -507,6 +621,8 @@
             customerName: customerName,
             date: invoiceDate,
             total: parseFloat(totalAmt) || 0,
+            status: payStatus,
+            creditDue: credAmt,
             items: items
         };
 
@@ -541,14 +657,17 @@
             const diffTime = todayObj - billDate;
             const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
+            // Kamai sirf unhi paison ki jodenge jo cash mila (Total - Credit)
+            const receivedAmount = bill.total - (bill.creditDue || 0);
+
             if (bill.date === todayStr) {
-                dailyTotal += bill.total;
+                dailyTotal += receivedAmount;
             }
             if (diffDays >= 0 && diffDays < 7) {
-                weeklyTotal += bill.total;
+                weeklyTotal += receivedAmount;
             }
             if (diffDays >= 0 && diffDays < 30) {
-                monthlyTotal += bill.total;
+                monthlyTotal += receivedAmount;
             }
         });
 
@@ -562,17 +681,22 @@
         tbody.innerHTML = '';
         
         if(billsHistory.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#94a3b8;">Kunai pani bill save kariyeko chaina.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#94a3b8;">Kunai pani bill save kariyeko chaina.</td></tr>`;
             return;
         }
 
         [...billsHistory].reverse().forEach((bill) => {
             const tr = document.createElement('tr');
+            const statusBadge = bill.status === "Credit" ? `<span class="badge badge-credit">Udhar</span>` : `<span class="badge badge-paid">Paid</span>`;
+            const creditText = bill.status === "Credit" ? `रु ${bill.creditDue.toFixed(2)}` : 'रु 0.00';
+            
             tr.innerHTML = `
                 <td><b>${bill.invoiceNum}</b></td>
                 <td>${bill.customerName || 'N/A'}</td>
                 <td>${bill.date}</td>
                 <td>रु ${bill.total.toFixed(2)}</td>
+                <td>${statusBadge}</td>
+                <td style="color: ${bill.status === "Credit" ? '#ef4444' : 'inherit'}; font-weight: bold;">${creditText}</td>
                 <td>
                     <button class="btn-view" onclick="viewOldBill(${bill.id})">🔍 View</button>
                     <button class="btn-danger" style="padding: 2px 6px; font-size:11px;" onclick="deleteFromHistory(${bill.id})">X</button>
@@ -589,6 +713,12 @@
         document.getElementById('customerName').value = bill.customerName;
         document.getElementById('invoiceNum').value = bill.invoiceNum;
         document.getElementById('invoiceDate').value = bill.date;
+        document.getElementById('paymentStatus').value = bill.status || 'Paid';
+        
+        toggleCreditInput();
+        if(bill.status === "Credit") {
+            document.getElementById('creditAmount').value = bill.creditDue || 0;
+        }
 
         const tbody = document.getElementById('itemRows');
         tbody.innerHTML = '';
