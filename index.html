@@ -3,206 +3,114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AR Bibidh Sewa - Online System</title>
-    <!-- CDN Links for Supabase, Tailwind, FontAwesome -->
+    <title>AR Bibidh Sewa - Login</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Mukta:wght@400;600;700&display=swap');
         body { font-family: 'Mukta', sans-serif; }
+        #login-screen { 
+            background-image: url('login-bg.png'); 
+            background-size: cover; 
+            background-position: center; 
+        }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen pb-12">
+<body>
 
-    <!-- Header -->
-    <header class="bg-blue-600 text-white shadow-md sticky top-0 z-50">
-        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
-            <div>
-                <h1 class="text-2xl font-bold tracking-wide">AR Bibidh Sewa</h1>
-                <p class="text-xs text-blue-200">ए.आर. बिबिध सेवा (अनलाइन प्रणाली)</p>
-            </div>
-            <div id="sync-status" class="bg-blue-700 text-xs px-3 py-1 rounded-full flex items-center gap-2">
-                <i class="fas fa-cloud-check text-green-400"></i> अनलाइन सिंक सक्रिय
-            </div>
+    <!-- Login Screen with Background -->
+    <div id="login-screen" class="min-h-screen flex items-center justify-center p-4">
+        <div class="bg-white/90 p-8 rounded-2xl shadow-2xl w-full max-w-sm border border-white">
+            <h2 class="text-2xl font-bold text-center text-blue-800 mb-6">AR Bibidh Sewa लगइन</h2>
+            <input type="text" id="user" placeholder="Username" class="w-full border p-3 rounded-xl mb-3 outline-none">
+            <input type="password" id="pass" placeholder="Password" class="w-full border p-3 rounded-xl mb-3 outline-none">
+            <label class="flex items-center gap-2 mb-4 text-sm text-gray-700">
+                <input type="checkbox" id="remember"> मलाई सम्झनुहोस्
+            </label>
+            <button onclick="checkLogin()" class="w-full bg-blue-700 text-white font-bold py-3 rounded-xl hover:bg-blue-800 transition shadow-lg">प्रवेश गर्नुहोस्</button>
         </div>
-    </header>
+    </div>
 
-    <!-- Main Container -->
-    <main class="max-w-4xl mx-auto px-4 mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-        
-        <!-- Section 1: Billing Form & History -->
-        <section class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-            <h2 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2 flex items-center gap-2">
-                <i class="fas fa-calculator text-blue-600"></i> बिलिङ प्रणाली (Billing)
-            </h2>
-            
-            <form id="billing-form" class="space-y-4">
+    <!-- App Screen -->
+    <div id="app-screen" class="hidden min-h-screen bg-gray-100 pb-12">
+        <header class="bg-blue-700 text-white shadow-lg">
+            <div class="max-w-4xl mx-auto px-4 py-6 flex justify-between items-center">
                 <div>
-                    <label class="block text-sm font-semibold text-gray-600 mb-1">ग्राहकको नाम (Customer Name)</label>
-                    <input type="text" id="cust-name" required class="w-full border rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
+                    <h1 class="text-2xl font-bold">AR Bibidh Sewa</h1>
+                    <p class="text-xs text-blue-200">डिजिटल बिलिङ प्रणाली</p>
                 </div>
-                <div>
-                    <label class="block text-sm font-semibold text-gray-600 mb-1">कुल रकम (Total Amount - रू.)</label>
-                    <input type="number" id="bill-amt" required class="w-full border rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
-                </div>
-                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg transition shadow">
-                    डेटा सुरक्षित गर्नुहोस (Save Bill)
-                </button>
-            </form>
-
-            <div class="mt-6">
-                <h3 class="text-md font-bold text-gray-700 mb-2">हालैका बिलहरू (Recent Bills)</h3>
-                <div id="billing-list" class="space-y-2 max-h-60 overflow-y-auto pr-1">
-                    <p class="text-sm text-gray-400 italic">लोड हुँदैछ...</p>
-                </div>
+                <button onclick="logout()" class="bg-red-600 px-4 py-2 rounded-lg text-sm font-bold hover:bg-red-700 transition">Logout</button>
             </div>
-        </section>
+        </header>
 
-        <!-- Section 2: Portfolio & Services -->
-        <section class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-            <h2 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2 flex items-center gap-2">
-                <i class="fas fa-images text-orange-600"></i> मेरो पोर्टफोलियो (My Portfolio)
-            </h2>
-
-            <form id="portfolio-form" class="space-y-4">
-                <div>
-                    <label class="block text-sm font-semibold text-gray-600 mb-1">सेवा/शीर्षक (Service Title)</label>
-                    <input type="text" id="port-title" required class="w-full border rounded-lg p-2.5 focus:ring-2 focus:ring-orange-500 outline-none" placeholder="उदा: पासपोर्ट साइज फोटो">
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold text-gray-600 mb-1">विवरण (Description)</label>
-                    <textarea id="port-desc" class="w-full border rounded-lg p-2.5 focus:ring-2 focus:ring-orange-500 outline-none h-20" placeholder="थप जानकारी यहाँ लेख्नुहोस्..."></textarea>
-                </div>
-                <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2.5 rounded-lg transition shadow">
-                    पोर्टफोलियोमा थप्नुहोस् (Add to Portfolio)
-                </button>
-            </form>
-
-            <div class="mt-6">
-                <h3 class="text-md font-bold text-gray-700 mb-2">थपिएका सेवाहरू (Portfolio Items)</h3>
-                <div id="portfolio-list" class="grid grid-cols-1 gap-3 max-h-60 overflow-y-auto pr-1">
-                    <p class="text-sm text-gray-400 italic">लोड हुँदैछ...</p>
-                </div>
+        <main class="max-w-4xl mx-auto px-4 mt-6">
+            <div class="bg-white p-6 rounded-2xl shadow-md border mb-6">
+                <form id="billing-form" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <input type="text" id="cust-name" placeholder="ग्राहकको नाम" required class="border p-3 rounded-xl outline-none">
+                    <select id="item-select" onchange="updatePrice()" class="border p-3 rounded-xl outline-none bg-white">
+                        <option value="Photocopy" data-price="10">Photocopy (रू. १०)</option>
+                        <option value="P.P Photo 6" data-price="150">P.P Photo 6 (रू. १५०)</option>
+                        <option value="P.P Photo 12" data-price="250">P.P Photo 12 (रू. २५०)</option>
+                        <option value="Nibedan" data-price="40">Nibedan (रू. ४०)</option>
+                        <option value="जन्म दर्ता" data-price="50">जन्म दर्ता (रू. ५०)</option>
+                        <option value="मृत्यु दर्ता" data-price="50">मृत्यु दर्ता (रू. ५०)</option>
+                        <option value="बसाइ सराइ" data-price="50">बसाइ सराइ (रू. ५०)</option>
+                        <option value="विवाह दर्ता" data-price="80">विवाह दर्ता (रू. ८०)</option>
+                        <option value="Paper" data-price="5">Photocopy Paper (रू. ५)</option>
+                    </select>
+                    <input type="number" id="bill-amt" required class="border p-3 rounded-xl outline-none" placeholder="रकम">
+                    <button type="submit" class="md:col-span-3 bg-blue-600 text-white font-bold py-3 rounded-xl">सेभ गर्नुहोस्</button>
+                </form>
             </div>
-        </section>
-
-    </main>
+            <div class="bg-white rounded-2xl shadow-md overflow-hidden">
+                <div id="billing-list" class="divide-y"></div>
+            </div>
+        </main>
+    </div>
 
     <script>
-        // Supabase Initialization
         const SUPABASE_URL = "https://kmceruxlxyjzisgklpdq.supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_YoAUip8_m33tXwLQ5X-fnw_W4yNxSMg";
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // Detect device info
-        const deviceType = /Mobi|Android|iPhone/i.test(navigator.userAgent) ? 'Mobile' : 'Computer';
+        function checkLogin() {
+            if(document.getElementById('user').value === "Pintu@12" && document.getElementById('pass').value === "157359") {
+                if(document.getElementById('remember').checked) localStorage.setItem('isLoggedIn', 'true');
+                showApp();
+            } else alert('गलत पासवर्ड!');
+        }
+        function showApp() { document.getElementById('login-screen').classList.add('hidden'); document.getElementById('app-screen').classList.remove('hidden'); fetchBills(); }
+        function logout() { localStorage.removeItem('isLoggedIn'); location.reload(); }
+        window.onload = () => { if(localStorage.getItem('isLoggedIn') === 'true') showApp(); };
 
-        // Load Data on Startup
-        window.addEventListener('DOMContentLoaded', () => {
-            fetchBills();
-            fetchPortfolio();
-        });
+        function updatePrice() {
+            const select = document.getElementById('item-select');
+            document.getElementById('bill-amt').value = select.options[select.selectedIndex].getAttribute('data-price');
+        }
 
-        // 1. BILLING LOGIC
         async function fetchBills() {
-            const listDiv = document.getElementById('billing-list');
-            const { data, error } = await _supabase
-                .from('billing_entries')
-                .select('*')
-                .order('created_at', { ascending: false });
-
-            if (error) {
-                listDiv.innerHTML = `<p class="text-red-500 text-xs">त्रुटि: लोड गर्न सकिएन</p>`;
-                return;
-            }
-
-            if (data.length === 0) {
-                listDiv.innerHTML = `<p class="text-sm text-gray-400 italic">कुनै रेकर्ड भेटिएन</p>`;
-                return;
-            }
-
-            listDiv.innerHTML = data.map(bill => `
-                <div class="bg-gray-50 p-3 rounded-lg border flex justify-between items-center text-sm">
-                    <div>
-                        <p class="font-bold text-gray-800">${bill.customer_name}</p>
-                        <p class="text-xs text-gray-400">${new Date(bill.created_at).toLocaleString('ne-NP')}</p>
-                    </div>
-                    <div class="text-right">
-                        <p class="font-bold text-blue-600">रू. ${bill.bill_amount}</p>
-                        <span class="text-[10px] bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded">${bill.device_type || 'Unknown'}</span>
-                    </div>
-                </div>
-            `).join('');
+            const { data } = await _supabase.from('billing_entries').select('*').order('created_at', { ascending: false });
+            document.getElementById('billing-list').innerHTML = data.map(b => `
+                <div class="p-4 flex justify-between items-center hover:bg-gray-50">
+                    <div><p class="font-bold text-gray-800">${b.customer_name}</p><p class="text-xs text-gray-500">${b.item_name}</p></div>
+                    <div class="flex items-center gap-4"><span class="font-bold text-blue-600">रू. ${b.bill_amount}</span>
+                    <button onclick="deleteBill('${b.id}')" class="text-red-500 hover:text-red-700"><i class="fas fa-trash"></i></button></div>
+                </div>`).join('');
         }
 
         document.getElementById('billing-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const statusDiv = document.getElementById('sync-status');
-            statusDiv.innerHTML = `<i class="fas fa-spinner fa-spin text-yellow-400"></i> सुरक्षित गरिँदैछ...`;
-
-            const name = document.getElementById('cust-name').value;
-            const amount = document.getElementById('bill-amt').value;
-
-            const { error } = await _supabase
-                .from('billing_entries')
-                .insert([{ customer_name: name, bill_amount: parseFloat(amount), device_type: deviceType }]);
-
-            if (error) {
-                alert('सुरक्षित गर्न सकिएन, कृपया पुन: प्रयास गर्नुहोस्।');
-            } else {
-                document.getElementById('billing-form').reset();
-                await fetchBills();
-            }
-            statusDiv.innerHTML = `<i class="fas fa-cloud-check text-green-400"></i> अनलाइन सिंक सक्रिय`;
+            await _supabase.from('billing_entries').insert([{ customer_name: document.getElementById('cust-name').value, item_name: document.getElementById('item-select').value, bill_amount: document.getElementById('bill-amt').value }]);
+            fetchBills();
         });
 
-        // 2. PORTFOLIO LOGIC
-        async function fetchPortfolio() {
-            const portDiv = document.getElementById('portfolio-list');
-            const { data, error } = await _supabase
-                .from('portfolio_entries')
-                .select('*')
-                .order('created_at', { ascending: false });
-
-            if (error) {
-                portDiv.innerHTML = `<p class="text-red-500 text-xs">त्रुटि: लोड गर्न सकिएन</p>`;
-                return;
+        async function deleteBill(id) {
+            if(confirm('हटाउन चाहनुहुन्छ?')) {
+                await _supabase.from('billing_entries').delete().eq('id', id);
+                fetchBills();
             }
-
-            if (data.length === 0) {
-                portDiv.innerHTML = `<p class="text-sm text-gray-400 italic">कुनै पोर्टफोलियो भेटिएन</p>`;
-                return;
-            }
-
-            portDiv.innerHTML = data.map(item => `
-                <div class="bg-orange-50/50 p-3 rounded-lg border border-orange-100">
-                    <h4 class="font-bold text-gray-800">${item.title}</h4>
-                    <p class="text-xs text-gray-600 mt-1">${item.description || 'विवरण उपलब्ध छैन'}</p>
-                </div>
-            `).join('');
         }
-
-        document.getElementById('portfolio-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const statusDiv = document.getElementById('sync-status');
-            statusDiv.innerHTML = `<i class="fas fa-spinner fa-spin text-yellow-400"></i> सुरक्षित गरिँदैछ...`;
-
-            const title = document.getElementById('port-title').value;
-            const desc = document.getElementById('port-desc').value;
-
-            const { error } = await _supabase
-                .from('portfolio_entries')
-                .insert([{ title: title, description: desc }]);
-
-            if (error) {
-                alert('पोर्टफोलियो थप्न सकिएन।');
-            } else {
-                document.getElementById('portfolio-form').reset();
-                await fetchPortfolio();
-            }
-            statusDiv.innerHTML = `<i class="fas fa-cloud-check text-green-400"></i> अनलाइन सिंक सक्रिय`;
-        });
     </script>
 </body>
 </html>
