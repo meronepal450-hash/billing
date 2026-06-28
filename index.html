@@ -2,115 +2,90 @@
 <html lang="ne">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AR Bibidh Sewa - Login</title>
+    <title>AR Bibidh Sewa - Pro</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Mukta:wght@400;600;700&display=swap');
-        body { font-family: 'Mukta', sans-serif; }
-        #login-screen { 
-            background-image: url('login-bg.png'); 
-            background-size: cover; 
-            background-position: center; 
-        }
-    </style>
 </head>
-<body>
+<body class="bg-gray-100">
 
-    <!-- Login Screen with Background -->
-    <div id="login-screen" class="min-h-screen flex items-center justify-center p-4">
-        <div class="bg-white/90 p-8 rounded-2xl shadow-2xl w-full max-w-sm border border-white">
-            <h2 class="text-2xl font-bold text-center text-blue-800 mb-6">AR Bibidh Sewa लगइन</h2>
-            <input type="text" id="user" placeholder="Username" class="w-full border p-3 rounded-xl mb-3 outline-none">
-            <input type="password" id="pass" placeholder="Password" class="w-full border p-3 rounded-xl mb-3 outline-none">
-            <label class="flex items-center gap-2 mb-4 text-sm text-gray-700">
-                <input type="checkbox" id="remember"> मलाई सम्झनुहोस्
-            </label>
-            <button onclick="checkLogin()" class="w-full bg-blue-700 text-white font-bold py-3 rounded-xl hover:bg-blue-800 transition shadow-lg">प्रवेश गर्नुहोस्</button>
+    <!-- Login -->
+    <div id="login-screen" class="min-h-screen flex items-center justify-center" style="background: url('login-bg.png') center/cover;">
+        <div class="bg-white/90 p-8 rounded-2xl w-80 shadow-2xl">
+            <h2 class="text-xl font-bold mb-4 text-center">लगइन गर्नुहोस्</h2>
+            <input type="text" id="user" placeholder="Username" class="w-full border p-2 mb-2 rounded">
+            <input type="password" id="pass" placeholder="Password" class="w-full border p-2 mb-4 rounded">
+            <button onclick="checkLogin()" class="w-full bg-blue-600 text-white py-2 rounded">प्रवेश</button>
         </div>
     </div>
 
-    <!-- App Screen -->
-    <div id="app-screen" class="hidden min-h-screen bg-gray-100 pb-12">
-        <header class="bg-blue-700 text-white shadow-lg">
-            <div class="max-w-4xl mx-auto px-4 py-6 flex justify-between items-center">
-                <div>
-                    <h1 class="text-2xl font-bold">AR Bibidh Sewa</h1>
-                    <p class="text-xs text-blue-200">डिजिटल बिलिङ प्रणाली</p>
-                </div>
-                <button onclick="logout()" class="bg-red-600 px-4 py-2 rounded-lg text-sm font-bold hover:bg-red-700 transition">Logout</button>
+    <!-- App -->
+    <div id="app-screen" class="hidden min-h-screen p-4">
+        <header class="bg-blue-800 text-white p-4 rounded-xl flex items-center justify-between mb-6">
+            <div class="flex items-center gap-3">
+                <img src="ChatGPT Image Jun 28, 2026, 02_49_58 PM.png" class="w-12 h-12 rounded-full">
+                <h1 class="text-xl font-bold">AR Bibidh Sewa</h1>
             </div>
+            <button onclick="logout()" class="bg-red-500 px-3 py-1 rounded text-sm">Logout</button>
         </header>
 
-        <main class="max-w-4xl mx-auto px-4 mt-6">
-            <div class="bg-white p-6 rounded-2xl shadow-md border mb-6">
-                <form id="billing-form" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <input type="text" id="cust-name" placeholder="ग्राहकको नाम" required class="border p-3 rounded-xl outline-none">
-                    <select id="item-select" onchange="updatePrice()" class="border p-3 rounded-xl outline-none bg-white">
-                        <option value="Photocopy" data-price="10">Photocopy (रू. १०)</option>
-                        <option value="P.P Photo 6" data-price="150">P.P Photo 6 (रू. १५०)</option>
-                        <option value="P.P Photo 12" data-price="250">P.P Photo 12 (रू. २५०)</option>
-                        <option value="Nibedan" data-price="40">Nibedan (रू. ४०)</option>
-                        <option value="जन्म दर्ता" data-price="50">जन्म दर्ता (रू. ५०)</option>
-                        <option value="मृत्यु दर्ता" data-price="50">मृत्यु दर्ता (रू. ५०)</option>
-                        <option value="बसाइ सराइ" data-price="50">बसाइ सराइ (रू. ५०)</option>
-                        <option value="विवाह दर्ता" data-price="80">विवाह दर्ता (रू. ८०)</option>
-                        <option value="Paper" data-price="5">Photocopy Paper (रू. ५)</option>
-                    </select>
-                    <input type="number" id="bill-amt" required class="border p-3 rounded-xl outline-none" placeholder="रकम">
-                    <button type="submit" class="md:col-span-3 bg-blue-600 text-white font-bold py-3 rounded-xl">सेभ गर्नुहोस्</button>
-                </form>
-            </div>
-            <div class="bg-white rounded-2xl shadow-md overflow-hidden">
-                <div id="billing-list" class="divide-y"></div>
-            </div>
-        </main>
+        <!-- Filters -->
+        <div class="flex gap-2 mb-4 overflow-x-auto">
+            <button onclick="setFilter('daily')" class="bg-blue-500 text-white px-4 py-2 rounded">Daily</button>
+            <button onclick="setFilter('weekly')" class="bg-blue-500 text-white px-4 py-2 rounded">Weekly</button>
+            <button onclick="setFilter('monthly')" class="bg-blue-500 text-white px-4 py-2 rounded">Monthly</button>
+        </div>
+
+        <!-- Form -->
+        <div class="bg-white p-4 rounded-xl shadow mb-6">
+            <input type="text" id="cust" placeholder="ग्राहकको नाम" class="w-full border p-2 mb-2">
+            <input type="text" id="item" placeholder="सामान" class="w-full border p-2 mb-2">
+            <input type="number" id="amt" placeholder="रकम" class="w-full border p-2 mb-2">
+            <select id="status" class="w-full border p-2 mb-2">
+                <option value="Paid">Paid</option>
+                <option value="Due">उधार (Due)</option>
+            </select>
+            <button onclick="saveBill()" class="w-full bg-green-600 text-white py-2 rounded">Save & Print</button>
+        </div>
+
+        <!-- List -->
+        <div id="billing-list" class="bg-white rounded-xl shadow p-4"></div>
     </div>
 
     <script>
-        const SUPABASE_URL = "https://kmceruxlxyjzisgklpdq.supabase.co";
-        const SUPABASE_ANON_KEY = "sb_publishable_YoAUip8_m33tXwLQ5X-fnw_W4yNxSMg";
-        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const _supabase = supabase.createClient("https://kmceruxlxyjzisgklpdq.supabase.co", "sb_publishable_YoAUip8_m33tXwLQ5X-fnw_W4yNxSMg");
 
         function checkLogin() {
             if(document.getElementById('user').value === "Pintu@12" && document.getElementById('pass').value === "157359") {
-                if(document.getElementById('remember').checked) localStorage.setItem('isLoggedIn', 'true');
-                showApp();
-            } else alert('गलत पासवर्ड!');
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('app-screen').classList.remove('hidden');
+                fetchBills();
+            } else alert('गलत पासवर्ड');
         }
-        function showApp() { document.getElementById('login-screen').classList.add('hidden'); document.getElementById('app-screen').classList.remove('hidden'); fetchBills(); }
-        function logout() { localStorage.removeItem('isLoggedIn'); location.reload(); }
-        window.onload = () => { if(localStorage.getItem('isLoggedIn') === 'true') showApp(); };
 
-        function updatePrice() {
-            const select = document.getElementById('item-select');
-            document.getElementById('bill-amt').value = select.options[select.selectedIndex].getAttribute('data-price');
+        async function saveBill() {
+            const bill = {
+                customer_name: document.getElementById('cust').value,
+                item_name: document.getElementById('item').value,
+                bill_amount: document.getElementById('amt').value,
+                status: document.getElementById('status').value,
+                created_at: new Date().toISOString()
+            };
+            await _supabase.from('billing_entries').insert([bill]);
+            window.print(); // Print Invoice
+            fetchBills();
         }
 
         async function fetchBills() {
             const { data } = await _supabase.from('billing_entries').select('*').order('created_at', { ascending: false });
             document.getElementById('billing-list').innerHTML = data.map(b => `
-                <div class="p-4 flex justify-between items-center hover:bg-gray-50">
-                    <div><p class="font-bold text-gray-800">${b.customer_name}</p><p class="text-xs text-gray-500">${b.item_name}</p></div>
-                    <div class="flex items-center gap-4"><span class="font-bold text-blue-600">रू. ${b.bill_amount}</span>
-                    <button onclick="deleteBill('${b.id}')" class="text-red-500 hover:text-red-700"><i class="fas fa-trash"></i></button></div>
+                <div class="border-b py-2 flex justify-between">
+                    <div><p class="font-bold">${b.customer_name} (#${b.id.slice(0,4)})</p><p class="text-xs text-gray-500">${b.created_at.slice(0,10)} - ${b.status}</p></div>
+                    <div class="font-bold text-blue-700">रू. ${b.bill_amount}</div>
                 </div>`).join('');
         }
-
-        document.getElementById('billing-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            await _supabase.from('billing_entries').insert([{ customer_name: document.getElementById('cust-name').value, item_name: document.getElementById('item-select').value, bill_amount: document.getElementById('bill-amt').value }]);
-            fetchBills();
-        });
-
-        async function deleteBill(id) {
-            if(confirm('हटाउन चाहनुहुन्छ?')) {
-                await _supabase.from('billing_entries').delete().eq('id', id);
-                fetchBills();
-            }
-        }
+        
+        function logout() { location.reload(); }
     </script>
 </body>
 </html>
