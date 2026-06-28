@@ -8,7 +8,6 @@
 </head>
 <body class="bg-gray-100 p-4">
 
-    <!-- App Screen -->
     <div id="app" class="max-w-4xl mx-auto">
         <!-- Header -->
         <header class="bg-blue-800 text-white p-4 rounded-xl flex justify-between items-center mb-6">
@@ -25,38 +24,36 @@
         <!-- Income Tabs -->
         <div class="bg-white p-4 rounded-xl shadow mb-6">
             <h2 class="font-bold mb-2 text-blue-800">📊 Income Summary</h2>
-            <div class="flex gap-2">
-                <button onclick="filterIncome('daily')" class="bg-blue-600 text-white px-4 py-1 rounded">Daily</button>
-                <button onclick="filterIncome('weekly')" class="bg-blue-600 text-white px-4 py-1 rounded">Weekly</button>
-                <button onclick="filterIncome('monthly')" class="bg-blue-600 text-white px-4 py-1 rounded">Monthly</button>
+            <div class="flex gap-2 mb-3">
+                <button onclick="filterIncome('daily')" class="bg-blue-600 text-white px-4 py-1 rounded text-sm">Daily</button>
+                <button onclick="filterIncome('weekly')" class="bg-blue-600 text-white px-4 py-1 rounded text-sm">Weekly</button>
+                <button onclick="filterIncome('monthly')" class="bg-blue-600 text-white px-4 py-1 rounded text-sm">Monthly</button>
             </div>
-            <p id="total-income" class="text-2xl font-bold mt-2">Total: रू. 0</p>
+            <p id="total-income" class="text-2xl font-bold">Total: रू. 0</p>
         </div>
 
-        <!-- Billing Form -->
-        <div class="bg-white p-6 rounded-xl shadow">
-            <p class="font-bold mb-4">Bill No: <span id="new-bill-no">Loading...</span></p>
+        <!-- Form -->
+        <div class="bg-white p-6 rounded-xl shadow mb-6">
             <input type="text" id="cust" placeholder="ग्राहकको नाम" class="w-full border p-2 mb-2 rounded">
-            
             <select id="item-list" onchange="calc()" class="w-full border p-2 mb-2 rounded">
                 <option value="Photocopy" data-price="10">Photocopy (रू. 10)</option>
                 <option value="P.P Photo 6" data-price="150">P.P Photo 6 (रू. 150)</option>
                 <option value="Nibedan" data-price="40">Nibedan (रू. 40)</option>
             </select>
-            
             <input type="number" id="qty" value="1" oninput="calc()" class="w-full border p-2 mb-2 rounded" placeholder="Quantity">
             <input type="number" id="amt" readonly class="w-full border p-2 mb-2 rounded bg-gray-100">
-            
-            <select id="status" class="w-full border p-2 mb-4 rounded">
-                <option value="Paid">Paid</option>
-                <option value="Due">उधार (Due)</option>
-            </select>
-
+            <select id="status" class="w-full border p-2 mb-4 rounded"><option value="Paid">Paid</option><option value="Due">उधार (Due)</option></select>
             <div class="grid grid-cols-3 gap-2">
-                <button onclick="newBill()" class="bg-gray-500 text-white py-2 rounded">New Bill</button>
+                <button onclick="newBill()" class="bg-gray-500 text-white py-2 rounded">New</button>
                 <button onclick="saveBill()" class="bg-green-600 text-white py-2 rounded">Save</button>
                 <button onclick="window.print()" class="bg-blue-600 text-white py-2 rounded">Print</button>
             </div>
+        </div>
+
+        <!-- Bill History -->
+        <div class="bg-white p-6 rounded-xl shadow">
+            <h2 class="font-bold mb-4">📜 बिल इतिहास (History)</h2>
+            <div id="history-list" class="space-y-2"></div>
         </div>
     </div>
 
@@ -65,27 +62,38 @@
         
         document.getElementById('date-display').innerText = new Date().toDateString();
 
-        function calc() {
-            const item = document.getElementById('item-list');
-            const price = item.options[item.selectedIndex].dataset.price;
-            document.getElementById('amt').value = price * document.getElementById('qty').value;
+        async function fetchHistory() {
+            const { data } = await _supabase.from('billing_entries').select('*').order('created_at', { ascending: false });
+            const list = document.getElementById('history-list');
+            list.innerHTML = data.map(b => `
+                <div class="border-b pb-2 flex justify-between items-center text-sm">
+                    <div><span class="font-bold">${b.customer_name}</span> - ${b.item_name}</div>
+                    <div class="font-bold text-blue-700">रू. ${b.bill_amount} (${b.status})</div>
+                </div>
+            `).join('');
         }
 
         async function saveBill() {
-            const bill = {
+            await _supabase.from('billing_entries').insert([{
                 customer_name: document.getElementById('cust').value,
                 item_name: document.getElementById('item-list').value,
                 bill_amount: document.getElementById('amt').value,
                 status: document.getElementById('status').value
-            };
-            await _supabase.from('billing_entries').insert([bill]);
+            }]);
             alert('Saved!');
+            fetchHistory();
+        }
+
+        function calc() {
+            const item = document.getElementById('item-list');
+            document.getElementById('amt').value = item.options[item.selectedIndex].dataset.price * document.getElementById('qty').value;
         }
 
         function newBill() { location.reload(); }
         function logout() { localStorage.removeItem('isLoggedIn'); location.reload(); }
         
-        // Initial setup
+        // Load history on start
+        fetchHistory();
         calc();
     </script>
 </body>
