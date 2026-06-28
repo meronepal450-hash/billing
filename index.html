@@ -2,90 +2,91 @@
 <html lang="ne">
 <head>
     <meta charset="UTF-8">
-    <title>AR Bibidh Sewa - Pro</title>
+    <title>AR Bibidh Sewa - Pro Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-gray-100">
+<body class="bg-gray-100 p-4">
 
-    <!-- Login -->
-    <div id="login-screen" class="min-h-screen flex items-center justify-center" style="background: url('login-bg.png') center/cover;">
-        <div class="bg-white/90 p-8 rounded-2xl w-80 shadow-2xl">
-            <h2 class="text-xl font-bold mb-4 text-center">लगइन गर्नुहोस्</h2>
-            <input type="text" id="user" placeholder="Username" class="w-full border p-2 mb-2 rounded">
-            <input type="password" id="pass" placeholder="Password" class="w-full border p-2 mb-4 rounded">
-            <button onclick="checkLogin()" class="w-full bg-blue-600 text-white py-2 rounded">प्रवेश</button>
-        </div>
-    </div>
-
-    <!-- App -->
-    <div id="app-screen" class="hidden min-h-screen p-4">
-        <header class="bg-blue-800 text-white p-4 rounded-xl flex items-center justify-between mb-6">
+    <!-- App Screen -->
+    <div id="app" class="max-w-4xl mx-auto">
+        <!-- Header -->
+        <header class="bg-blue-800 text-white p-4 rounded-xl flex justify-between items-center mb-6">
             <div class="flex items-center gap-3">
                 <img src="ChatGPT Image Jun 28, 2026, 02_49_58 PM.png" class="w-12 h-12 rounded-full">
-                <h1 class="text-xl font-bold">AR Bibidh Sewa</h1>
+                <div>
+                    <h1 class="text-xl font-bold">AR Bibidh Sewa</h1>
+                    <p class="text-xs" id="date-display"></p>
+                </div>
             </div>
             <button onclick="logout()" class="bg-red-500 px-3 py-1 rounded text-sm">Logout</button>
         </header>
 
-        <!-- Filters -->
-        <div class="flex gap-2 mb-4 overflow-x-auto">
-            <button onclick="setFilter('daily')" class="bg-blue-500 text-white px-4 py-2 rounded">Daily</button>
-            <button onclick="setFilter('weekly')" class="bg-blue-500 text-white px-4 py-2 rounded">Weekly</button>
-            <button onclick="setFilter('monthly')" class="bg-blue-500 text-white px-4 py-2 rounded">Monthly</button>
+        <!-- Income Tabs -->
+        <div class="bg-white p-4 rounded-xl shadow mb-6">
+            <h2 class="font-bold mb-2 text-blue-800">📊 Income Summary</h2>
+            <div class="flex gap-2">
+                <button onclick="filterIncome('daily')" class="bg-blue-600 text-white px-4 py-1 rounded">Daily</button>
+                <button onclick="filterIncome('weekly')" class="bg-blue-600 text-white px-4 py-1 rounded">Weekly</button>
+                <button onclick="filterIncome('monthly')" class="bg-blue-600 text-white px-4 py-1 rounded">Monthly</button>
+            </div>
+            <p id="total-income" class="text-2xl font-bold mt-2">Total: रू. 0</p>
         </div>
 
-        <!-- Form -->
-        <div class="bg-white p-4 rounded-xl shadow mb-6">
-            <input type="text" id="cust" placeholder="ग्राहकको नाम" class="w-full border p-2 mb-2">
-            <input type="text" id="item" placeholder="सामान" class="w-full border p-2 mb-2">
-            <input type="number" id="amt" placeholder="रकम" class="w-full border p-2 mb-2">
-            <select id="status" class="w-full border p-2 mb-2">
+        <!-- Billing Form -->
+        <div class="bg-white p-6 rounded-xl shadow">
+            <p class="font-bold mb-4">Bill No: <span id="new-bill-no">Loading...</span></p>
+            <input type="text" id="cust" placeholder="ग्राहकको नाम" class="w-full border p-2 mb-2 rounded">
+            
+            <select id="item-list" onchange="calc()" class="w-full border p-2 mb-2 rounded">
+                <option value="Photocopy" data-price="10">Photocopy (रू. 10)</option>
+                <option value="P.P Photo 6" data-price="150">P.P Photo 6 (रू. 150)</option>
+                <option value="Nibedan" data-price="40">Nibedan (रू. 40)</option>
+            </select>
+            
+            <input type="number" id="qty" value="1" oninput="calc()" class="w-full border p-2 mb-2 rounded" placeholder="Quantity">
+            <input type="number" id="amt" readonly class="w-full border p-2 mb-2 rounded bg-gray-100">
+            
+            <select id="status" class="w-full border p-2 mb-4 rounded">
                 <option value="Paid">Paid</option>
                 <option value="Due">उधार (Due)</option>
             </select>
-            <button onclick="saveBill()" class="w-full bg-green-600 text-white py-2 rounded">Save & Print</button>
-        </div>
 
-        <!-- List -->
-        <div id="billing-list" class="bg-white rounded-xl shadow p-4"></div>
+            <div class="grid grid-cols-3 gap-2">
+                <button onclick="newBill()" class="bg-gray-500 text-white py-2 rounded">New Bill</button>
+                <button onclick="saveBill()" class="bg-green-600 text-white py-2 rounded">Save</button>
+                <button onclick="window.print()" class="bg-blue-600 text-white py-2 rounded">Print</button>
+            </div>
+        </div>
     </div>
 
     <script>
         const _supabase = supabase.createClient("https://kmceruxlxyjzisgklpdq.supabase.co", "sb_publishable_YoAUip8_m33tXwLQ5X-fnw_W4yNxSMg");
+        
+        document.getElementById('date-display').innerText = new Date().toDateString();
 
-        function checkLogin() {
-            if(document.getElementById('user').value === "Pintu@12" && document.getElementById('pass').value === "157359") {
-                document.getElementById('login-screen').classList.add('hidden');
-                document.getElementById('app-screen').classList.remove('hidden');
-                fetchBills();
-            } else alert('गलत पासवर्ड');
+        function calc() {
+            const item = document.getElementById('item-list');
+            const price = item.options[item.selectedIndex].dataset.price;
+            document.getElementById('amt').value = price * document.getElementById('qty').value;
         }
 
         async function saveBill() {
             const bill = {
                 customer_name: document.getElementById('cust').value,
-                item_name: document.getElementById('item').value,
+                item_name: document.getElementById('item-list').value,
                 bill_amount: document.getElementById('amt').value,
-                status: document.getElementById('status').value,
-                created_at: new Date().toISOString()
+                status: document.getElementById('status').value
             };
             await _supabase.from('billing_entries').insert([bill]);
-            window.print(); // Print Invoice
-            fetchBills();
+            alert('Saved!');
         }
 
-        async function fetchBills() {
-            const { data } = await _supabase.from('billing_entries').select('*').order('created_at', { ascending: false });
-            document.getElementById('billing-list').innerHTML = data.map(b => `
-                <div class="border-b py-2 flex justify-between">
-                    <div><p class="font-bold">${b.customer_name} (#${b.id.slice(0,4)})</p><p class="text-xs text-gray-500">${b.created_at.slice(0,10)} - ${b.status}</p></div>
-                    <div class="font-bold text-blue-700">रू. ${b.bill_amount}</div>
-                </div>`).join('');
-        }
+        function newBill() { location.reload(); }
+        function logout() { localStorage.removeItem('isLoggedIn'); location.reload(); }
         
-        function logout() { location.reload(); }
+        // Initial setup
+        calc();
     </script>
 </body>
 </html>
